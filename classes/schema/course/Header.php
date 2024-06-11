@@ -9,31 +9,30 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_data_transfer\schema;
+namespace local_data_transfer\schema\course;
 
 use stdClass;
+use Exception;
 
 /**
  * Retrieve and store course header data
  * 
  * CourseHeader class
  */
-class CourseHeader
+class Header
 {
-
-    public $schema;
-
-    private $courseid;
-
+    public stdClass $schema;
+    private int $courseid;
     private $DB;
 
     /**
      * Constructor
      * 
-     * @param object $course
+     * @param int $courseid
      */
-    public function __construct($courseid, $DB)
+    public function __construct(int $courseid)
     {
+        global $DB;
         $this->DB = $DB;
         $this->courseid = $courseid;
         $this->schema = new stdClass();
@@ -44,18 +43,15 @@ class CourseHeader
     /**
      * Set the course header data
      * 
-     * This function create headers in the schema object
+     * This function creates headers in the schema object
      * if in the future we need to add new headers we can do it here
      * at the moment we only have the general headers.
      * 
-     * It should be a function to populate headers with data
-     * 
-     * 
      * @return void
      */
-    private function set_headers()
+    private function set_headers(): void
     {
-        return $this->schema->general = new stdClass();
+        $this->schema->general = new stdClass();
     }
 
     /**
@@ -65,7 +61,7 @@ class CourseHeader
      * 
      * @return void
      */
-    private function set_headers_data()
+    private function set_headers_data(): void
     {
         $this->fill_header_general();
     }
@@ -73,24 +69,31 @@ class CourseHeader
     /**
      * Fill the general header data in the schema object
      * 
-     * Note: Check the json schema prototype to see the structure
+     * Note: Check the JSON schema prototype to see the structure
      * 
      * @return void
      */
-    private function fill_header_general()
+    private function fill_header_general(): void
     {
-        if(!$course = $this->DB->get_record('course', array('id' => $this->courseid), 'category, fullname, shortname, idnumber')){
-            throw new \Exception('Course not found');
+
+        $course = $this->DB->get_record('course', ['id' => $this->courseid], 'category, fullname, shortname, idnumber');
+        if (!$course) {
+            throw new Exception('Course not found');
         }
+
         $this->schema->general->category = $course->category;
         $this->schema->general->fullname = $course->fullname;
         $this->schema->general->shortname = $course->shortname;
         $this->schema->general->idnumber = $course->idnumber;
-        return;
     }
 
-    public function get_course_header()
+    /**
+     * Get the course header schema in JSON format
+     * 
+     * @return string JSON schema
+     */
+    public function get_json_schema(): string
     {
-        return $this->schema;
+        return json_encode($this->schema);
     }
 }
