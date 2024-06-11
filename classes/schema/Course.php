@@ -8,9 +8,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_data_transfer\Core; 
-
-defined('MOODLE_INTERNAL') || die();
+namespace local_data_transfer\schema;
 
 /**
  * Course class
@@ -24,10 +22,34 @@ defined('MOODLE_INTERNAL') || die();
  */
 class Course{
 
-    public $course_header;
+    public $courseid;
+    public CourseHeader $course_header;
     public $course_content;
     public array $groups;
     public array $groupings;
+    private $DB;
+
+    /**
+     * Constructor
+     * 
+     * @param object $course
+     */
+    public function __construct($courseid = 0, $DB){
+        $this->DB = $DB;
+        $this->courseid = $courseid;
+        if($courseid){
+            $this->set_course_header();
+            return;
+        }
+    }
+
+    public function set_course_header(){
+        $this->course_header = new CourseHeader($this->courseid, $this->DB);
+    }
+
     
+
+
+
 }
 

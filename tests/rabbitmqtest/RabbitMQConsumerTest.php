@@ -1,10 +1,11 @@
 <?php
+
 namespace local_data_transfer\tests\rabbitmqtest;
 
 use PHPUnit\Framework\TestCase;
-use local_data_transfer\external\rabbitmq\RabbitMQConnection;
-use local_data_transfer\external\rabbitmq\RabbitMQPublisher;
-use local_data_transfer\external\rabbitmq\RabbitMQConsumer;
+use local_data_transfer\external\rabbitmq\Connection;
+use local_data_transfer\external\rabbitmq\Publisher;
+use local_data_transfer\external\rabbitmq\Consumer;
 
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
@@ -13,13 +14,13 @@ class RabbitMQConsumerTest extends TestCase {
 
     protected function setUp(): void {
         $config = require __DIR__ . '/config.php';
-        $this->connection = new RabbitMQConnection(
+        $this->connection = new Connection(
             $config['rabbitmq']['host'],
             $config['rabbitmq']['port'],
             $config['rabbitmq']['user'],
             $config['rabbitmq']['password']
         );
-        $this->connection->connect();
+        $this->connection->connect('test_queue');
     }
 
     protected function tearDown(): void {
@@ -27,20 +28,19 @@ class RabbitMQConsumerTest extends TestCase {
     }
 
     public function testConsume() {
-        $consumer = new RabbitMQConsumer($this->connection->getConnection(), 'test_queue');
-
-        $callback = function ($msg) use ($consumer) {
-            $this->assertEquals('Test Message', $msg->body);
-            $consumer->stopConsuming(); // Para detener el consumo después de recibir el mensaje
-        };
-
-        // Publicar un mensaje de prueba en la cola
-        $publisher = new RabbitMQPublisher($this->connection->getConnection());
-        $publisher->publish('Test Message', 'test_queue');
+        $publisher = new Publisher($this->connection->getConnection(), 'test_exchange');
+        $publisher->publish('Test Message', 'test_routing_key');
         $publisher->close();
 
-        // Consumir el mensaje de prueba
-        $consumer->consume($callback);
-        $consumer->close();
+        // Verificar si el mensaje fue consumido
+        $messageReceived = false;
+        $consumer = new Consumer($this->connection, function ($msg) use (&$messageReceived) {
+            $messageReceived = ($msg->body === 'Test Message');
+        });
+
+        // Configurar el consumidor para escuchar el mensaje
+        $consumer('test_queue', 'test_exchange', 'test_routing_key');
+
+        $this->assertTrue($messageReceived);
     }
 }

@@ -1,18 +1,11 @@
-<?php 
-/**
- * RabbitMQ Publisher
- *
- * @package     local_data_transfer
- * @category    external_rabbitmq_connection
- * @copyright   Franklin López
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+<?php
+
 namespace local_data_transfer\external\rabbitmq;
 
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-class RabbitMQPublisher {
+class Publisher {
     private $connection;
     private $channel;
     private $exchange;
@@ -21,6 +14,9 @@ class RabbitMQPublisher {
         $this->connection = $connection;
         $this->exchange = $exchange;
         $this->channel = $this->connection->channel();
+        if ($exchange) {
+            $this->channel->exchange_declare($exchange, 'direct', false, true, false);
+        }
     }
 
     public function publish($message, $routingKey = '') {

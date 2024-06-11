@@ -1,0 +1,91 @@
+{
+    "header": {
+      "general": {
+        "moodleid": "number",
+        "fullname": "string",
+        "shortname": "string",
+        "idnumber": "string",
+        "categoryid": "int"
+      }
+    },
+    "sections": [
+      {
+        "name": "string",
+        "availability": "string",
+        "mods": [
+          {
+            "modtype": "url",
+            "header": {
+              "general": {
+                "name": "string",
+                "url": "string",
+                "description?": "string"
+              }
+            }
+          },
+          {
+            "modtype": "forum",
+            "header": {
+              "general": {
+                "name": "string"
+              }
+            }
+          },
+          {
+            "modtype": "assign",
+            "header": {
+              "general": {
+                "name": "string",
+                "grade": "number"
+              },
+              "availability": {
+                "duedate": "timestamp",
+                "cutoffdate": "timestamp"
+              }
+            }
+          },
+          {
+            "modtype": "quiz",
+            "header": {
+              "general": {
+                "name": "string",
+                "maximungrade": "number"
+              },
+              "timing": {
+                "openquiz": "timestamp",
+                "closequiz": "timestamp"
+              }
+            },
+            "questions": [
+              {
+                // data dependes on question type
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "header": {
+          "general": {
+            "name": "string",
+            "identifier": "string"
+          }
+        }
+      }
+    ],
+    "groupings": [
+      {
+        "header": {
+          "general": {
+            "name": "string",
+            "description ": "description",
+            "descriptionformat ": "int", //description format (1 = HTML, 0 = MOODLE, 2 = PLAIN or 4 = MARKDOWN)
+            "idnumber": "string"
+          },
+          "groups": ["groupindentifier1", "groupindentifier2"]
+        }
+      }
+    ]
+  }
