@@ -97,8 +97,22 @@ class Content
     {
         $this->schema->sections = array_map(function ($section) {
             return $section->get_schema();
-        }, $this->sections);
+        }, array_values($this->sections));
 
         return json_encode($this->schema);
+    }
+
+    /**
+     * Get the schema
+     * 
+     * @return object
+     */
+    public function get_schema($include_mods): object
+    {
+        $this->schema->sections = array_map(function ($section) use ($include_mods) {
+            return $section->get_schema($include_mods);
+        }, array_values($this->sections));
+
+        return $this->schema;
     }
 }

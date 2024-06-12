@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /**
  * Webservices definition
  *
@@ -13,12 +14,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . './../../vendor/autoload.php');
 
-/**
- * This class is used to get an experience
- *
- * @copyright 2024 ADSDR-FUNIBER Scepter Team
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+use local_data_transfer\schema\course\Course;
+
 class external_course extends external_api
 {
     /**
@@ -30,7 +27,15 @@ class external_course extends external_api
     {
         return new external_function_parameters(
             [
-                'id' => new external_value(PARAM_INT, 'course ID'),
+                'courseid' => new external_value(PARAM_INT, 'course ID'),
+                'includes' => new external_single_structure(
+                    [
+                        'header' => new external_value(PARAM_BOOL, 'include header', VALUE_OPTIONAL),
+                        'content' => new external_value(PARAM_BOOL, 'include content', VALUE_OPTIONAL),
+                        'groups' => new external_value(PARAM_BOOL, 'include groups', VALUE_OPTIONAL),
+                        'groupings' => new external_value(PARAM_BOOL, 'include groupings', VALUE_OPTIONAL),
+                    ]
+                )
             ]
         );
     }
@@ -38,17 +43,27 @@ class external_course extends external_api
     /**
      * Get a course schema
      *
-     * @param  int   $id The course ID
+     * @param int $courseid The course ID
+     * @param array $includes The sections to include
      * @return array The result of the operation
      */
-    public static function get_course_schema($id)
+    public static function get_course_schema($courseid, $includes)
     {
-        // checke parameters
-        $params = self::validate_parameters(self::get_course_schema_parameters(), ['id' => $id]);
+        $params = self::validate_parameters(self::get_course_schema_parameters(), ['courseid' => $courseid, 'includes' => $includes]);
 
-        return [
-            'result' => true,
+        $course = new Course(
+            $params['courseid'], 
+            $params['includes']['header'], 
+            $params['includes']['content'], 
+            $params['includes']['groups'], 
+            $params['includes']['groupings']
+        );
+
+        $opt = [
+            'include_mods' => false
         ];
+
+        return $course->get_schema($opt);
     }
 
     /**
@@ -60,9 +75,65 @@ class external_course extends external_api
     {
         return new external_single_structure(
             [
-                'result' => new external_value(PARAM_BOOL, 'The result of the operation'),
+                'courseid' => new external_value(PARAM_INT, 'course ID'),
+                'header' => new external_single_structure(
+                    [
+                        'general' => new external_single_structure(
+                            [
+                                'category' => new external_value(PARAM_INT, 'category'),
+                                'fullname' => new external_value(PARAM_TEXT, 'fullname'),
+                                'shortname' => new external_value(PARAM_TEXT, 'shortname'),
+                                'idnumber' => new external_value(PARAM_TEXT, 'idnumber'),
+                            ],
+                            'general',
+                            VALUE_OPTIONAL
+                        ),
+                    ],
+                    'header',
+                    VALUE_OPTIONAL
+                ),
+                'content' => new external_single_structure(
+                    [
+                        'sections' => new external_multiple_structure(
+                            new external_single_structure(
+                                [
+                                    'id' => new external_value(PARAM_INT, 'id'),
+                                    'section' => new external_value(PARAM_INT, 'section'),
+                                    'name' => new external_value(PARAM_TEXT, 'name'),
+                                    'visible' => new external_value(PARAM_INT, 'visible'),
+                                    'availability' => new external_value(PARAM_TEXT, 'availability'),
+                                ]
+                            )
+                        ),
+                    ],
+                    'content',
+                    VALUE_OPTIONAL
+                ),
+                'groups' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'group ID'),
+                            'name' => new external_value(PARAM_TEXT, 'group name'),
+                            'idnumber' => new external_value(PARAM_TEXT, 'group idnumber'),
+                            'description' => new external_value(PARAM_RAW, 'group description'),
+                        ]
+                    ),
+                    'groups', VALUE_OPTIONAL
+                ),
+                'groupings' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'grouping ID'),
+                            'name' => new external_value(PARAM_TEXT, 'grouping name'),
+                            'description' => new external_value(PARAM_RAW, 'grouping description'),
+                            'groups' => new external_multiple_structure(
+                                new external_value(PARAM_INT, 'group ID')
+                            ),
+                        ]
+                    ),
+                    'groupings', VALUE_OPTIONAL
+                ),
             ]
         );
     }
-      
 }

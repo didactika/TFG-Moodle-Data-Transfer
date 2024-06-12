@@ -96,4 +96,14 @@ class Header
     {
         return json_encode($this->schema);
     }
+
+    /**
+     * Get the course header schema 
+     * 
+     * @return object The schema object
+     */
+    public function get_schema(): object
+    {
+        return $this->schema;
+    }
 }

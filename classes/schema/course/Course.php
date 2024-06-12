@@ -68,6 +68,9 @@ class Course
      */
     private function set_course_data(): void
     {
+        if ($this->verify_if_course_exist() === false) {
+            throw new \Exception('Course does not exist');
+        }
         if ($this->include_header) {
             $this->set_header();
         }
@@ -123,29 +126,42 @@ class Course
     }
 
     /**
-     * Get the course data schema in JSON format
+     * Get the course data schema
      * 
-     * @return string JSON schema
+     * @param array $opt Options to include in the schema
+     * @return array
      */
-    public function get_json_schema(): string
+    public function get_schema(array $opt): array
     {
+        list('include_mods' => $include_mods) = $opt;
+
         $course = [
             'courseid' => $this->courseid,
         ];
 
         if ($this->include_header && $this->course_header !== null) {
-            $course['header'] = $this->course_header->get_json_schema();
+            $course['header'] = $this->course_header->get_schema();
         }
         if ($this->include_content && $this->course_content !== null) {
-            $course['content'] = $this->course_content->get_json_schema();
+            $course['content'] = $this->course_content->get_schema($include_mods);
         }
-        // if ($this->include_groups && $this->course_groups !== null) {
-        //     $course['groups'] = $this->course_groups->get_json_schema();
-        // }
-        // if ($this->include_groupings && $this->course_groupings !== null) {
-        //     $course['groupings'] = $this->course_groupings->get_json_schema();
-        // }
+        if ($this->include_groups && $this->course_groups !== null) {
+            $course['groups'] = $this->course_groups->get_groups();
+        }
+        if ($this->include_groupings && $this->course_groupings !== null) {
+            $course['groupings'] = $this->course_groupings->get_groupings();
+        }
 
-        return json_encode($course);
+        return $course;
+    }
+
+    /**
+     * Verify if the course exists
+     * 
+     * @return bool
+     */
+    private function verify_if_course_exist(): bool
+    {
+        return $this->DB->record_exists('course', ['id' => $this->courseid]);
     }
 }
