@@ -27,3 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Herramienta de exportación/importación de cursos Moodle en formato JSON';
 
+$string['task:event_task'] = 'Obtener datos de migración de fuente externa';
+
+$string['setting:external_rabbitmq_host'] = 'RabbitMQ Host';
+$string['setting:external_rabbitmq_port'] = 'RabbitMQ Port';
+$string['setting:external_rabbitmq_user'] = 'RabbitMQ User';
+$string['setting:external_rabbitmq_password'] = 'RabbitMQ Password';
+$string['setting:external_rabbitmq_queue'] = 'RabbitMQ Queue';

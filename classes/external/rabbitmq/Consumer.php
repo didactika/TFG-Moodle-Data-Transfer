@@ -15,16 +15,17 @@ class Consumer
         $this->messageObject = $messageObject;
     }
 
-    public function __invoke(string $queue = '', string $exchange = '', string $routingKey = ''): void
+    public function execute(string $queue = '', string $exchange = '', string $routingKey = ''): void
     {
         $channel = $this->connection->getChannel();
 
         echo "Connect open, channel id: " . json_encode($channel->getChannelId()) . PHP_EOL;
 
-        $callback = function (AMQPMessage $msg) {
+        $callback = function (AMQPMessage $msg) use ($channel) {
             echo "Consuming event" . PHP_EOL;
             $msg->getChannel()->basic_ack($msg->getDeliveryTag());
             $this->messageReceived($msg);
+            $channel->basic_cancel($msg->getConsumerTag()); // Cancel after one message
         };
 
         $channel->queue_bind($queue, $exchange, $routingKey);
@@ -34,6 +35,10 @@ class Consumer
         while ($channel->is_consuming()) {
             $channel->wait();
         }
+
+        $channel->close();
+        $this->connection->close();
+        echo "Connection closed" . PHP_EOL;
     }
 
     public function messageReceived(AMQPMessage $msg): void
@@ -46,3 +51,6 @@ class Consumer
         call_user_func($this->messageObject, $msg);
     }
 }
+
+
+
