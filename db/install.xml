@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMLDB PATH="local_data_transfer/db" VERSION="2024010100" COMMENT="Saving pending events">
+    <TABLES>
+        <TABLE NAME="pending_commands" COMMENT="Store pending events">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Primary Key"/>
+                <FIELD NAME="json_data" TYPE="text" LENGTH="big" NOTNULL="true" COMMENT="JSON data"/>
+                <FIELD NAME="type" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Type of JSON data"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+    </TABLES>
+</XMLDB>
