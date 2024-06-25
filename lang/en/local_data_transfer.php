@@ -34,3 +34,5 @@ $string['setting:external_rabbitmq_port'] = 'RabbitMQ Port';
 $string['setting:external_rabbitmq_user'] = 'RabbitMQ User';
 $string['setting:external_rabbitmq_password'] = 'RabbitMQ Password';
 $string['setting:external_rabbitmq_queue'] = 'RabbitMQ Queue';
+$string['setting:external_rabbitmq_exchange'] = 'RabbitMQ Exchange';
+$string['setting:external_rabbitmq_vhost'] = 'RabbitMQ Virtual Host';

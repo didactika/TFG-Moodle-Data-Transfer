@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * RabbitMQ Publisher
@@ -10,3 +10,15 @@
  */
 
 namespace local_data_transfer\external\rabbitmq;
+
+class Dispatcher
+{
+
+    public static function callback_dispatcher($msg)
+    {
+        $properties = $msg->getBody();
+        $body = $msg->get_properties();
+        // TODO validate event header in event validator ? 
+        // TODO Get type and redirect 
+    }
+}

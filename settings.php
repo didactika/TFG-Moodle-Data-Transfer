@@ -60,6 +60,25 @@ if ($hassiteconfig) {
                 'local_data_transfer/external_rabbitmq_queue', 
                 get_string('setting:external_rabbitmq_queue', 'local_data_transfer'),
                 "",
+                "queue",
+                PARAM_RAW
+            )
+        );
+        $settings->add(
+            new admin_setting_configtext(
+                'local_data_transfer/external_rabbitmq_exchange', 
+                get_string('setting:external_rabbitmq_exchange', 'local_data_transfer'),
+                "",
+                "exchange",
+                PARAM_RAW
+            )
+        );
+        $settings->add(
+            new admin_setting_configtext(
+                'local_data_transfer/external_rabbitmq_vhost', 
+                get_string('setting:external_rabbitmq_vhost', 'local_data_transfer'),
+                "",
+                "/",
                 PARAM_RAW
             )
         );

@@ -11,7 +11,7 @@ class Connection {
     private $password;
     private $connection;
     private $channel;
-    private $queue;
+    private $vhost;
 
     /**
      * Constructor for the Connection class.
@@ -21,30 +21,29 @@ class Connection {
      * @param string $user
      * @param string $password
      */
-    public function __construct($host, $port, $user, $password) {
+    public function __construct($host, $port, $user, $password, $vhost) {
         $this->host = $host;
         $this->port = $port;
         $this->user = $user;
         $this->password = $password;
+        $this->vhost = $vhost;
+        $this->connect();
     }
 
     /**
-     * Establishes a connection to RabbitMQ and declares a queue.
+     * Establishes a connection to RabbitMQ
      *
-     * @param string $queue
      * @return AMQPStreamConnection
      */
-    public function connect($queue) {
-        $this->queue = $queue;
+    private function connect() {
         $this->connection = new AMQPStreamConnection(
             $this->host,
             $this->port,
             $this->user,
-            $this->password
+            $this->password,
+            $this->vhost
         );
         $this->channel = $this->connection->channel();
-        $this->channel->queue_declare($this->queue, false, true, false, false);
-        return $this->connection;
     }
 
     /**
@@ -52,7 +51,7 @@ class Connection {
      *
      * @return AMQPChannel
      */
-    public function getChannel() {
+    public function get_channel() {
         return $this->channel;
     }
 
@@ -69,7 +68,7 @@ class Connection {
      *
      * @return AMQPStreamConnection
      */
-    public function getConnection() {
+    public function get_connection() {
         return $this->connection;
     }
 }

@@ -8,12 +8,13 @@
  * @copyright   Franklin López
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_data_transfer\tasks;
+
+
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use local_data_transfer\external\rabbitmq\Connection;
 use local_data_transfer\external\rabbitmq\Consumer;
-use PhpAmqpLib\Message\AMQPMessage;
 
 
 defined('MOODLE_INTERNAL') || die();
@@ -41,17 +42,13 @@ class EventTask extends \core\task\scheduled_task
         $port = $settings->external_rabbitmq_port;
         $user = $settings->external_rabbitmq_user;
         $password = $settings->external_rabbitmq_password;
+        $queue = $settings->external_rabbitmq_queue;
+        $exchange = $settings->external_rabbitmq_exchange;
+        $vhost = $settings->external_rabbitmq_vhost;
 
-        $connection = new Connection($host, $port, $user, $password);
+        $connection = new Connection($host, $port, $user, $password, $vhost);
 
-        // Define the message processing callback
-        $messageCallback = function (AMQPMessage $msg) {
-            // Process the message
-            echo "Processing message: " . $msg->body . PHP_EOL;
-        };
-
-        // Create and run the consumer
-        $consumer = new Consumer($connection, $messageCallback);
-        $consumer->execute('your_queue_name', 'your_exchange_name', 'your_routing_key');
+        $consumer = new Consumer($connection);
+        $consumer->execute($queue, $exchange);
     }
 }
