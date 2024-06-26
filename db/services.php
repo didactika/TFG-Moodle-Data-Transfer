@@ -14,9 +14,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $functions = [
     'local_data_transfer_get_course' => [
-        'classname'   => 'external_course',
+        'classname'   => 'local_data_transfer\services\external_course',
         'methodname'  => 'get_course_schema',
-        'classpath'   => 'local/data_transfer/classes/services/course.php',
         'description' => 'Get course schema',
         'type'        => 'read',
         'ajax'        => true,

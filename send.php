@@ -11,10 +11,58 @@ $channel = $connection->channel();
 $channel->queue_declare('task_queue', false, true, false, false);
 
 $record = [
-    'uuid' => "ddsddsd",
-    'fired_at' => date('Y-m-d\TH:i:s\Z', time()),
-    'final_grade' => "fff",
+    "courseid" => 2,
+    "header" => [
+        "general" => [
+            "category" => 2,
+            "fullname" => "SNCNC1-2021",
+            "shortname" => "SNCNC1-2021",
+            "idnumber" => "40aa0418-aa9a-5fe0-85d2-77c34e29736b||2021"
+        ]
+    ],
+    "content" => [
+        "sections" => [
+            [
+                "id" => 1,
+                "section" => 0,
+                "name" => null,
+                "visible" => 1,
+                "availability" => null
+            ],
+            [
+                "id" => 2,
+                "section" => 1,
+                "name" => null,
+                "visible" => 1,
+                "availability" => null
+            ],
+            [
+                "id" => 3,
+                "section" => 2,
+                "name" => null,
+                "visible" => 1,
+                "availability" => null
+            ],
+            [
+                "id" => 4,
+                "section" => 3,
+                "name" => null,
+                "visible" => 1,
+                "availability" => null
+            ],
+            [
+                "id" => 5,
+                "section" => 4,
+                "name" => null,
+                "visible" => 1,
+                "availability" => null
+            ]
+        ]
+    ],
+    "groups" => [],
+    "groupings" => []
 ];
+
 
 
 $msg = new AMQPMessage(
@@ -24,11 +72,20 @@ $msg = new AMQPMessage(
         'type' => 'test.dominos',
         'timestamp' => time(),
         'delivery_mode' => 2,
-        'content_type' => 'aplication/json'
+        'content_type' => 'application/json'
     )
 );
 
 
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
 $channel->basic_publish($msg, 'eto');
 
 echo ' [x] Sent ', json_encode($record), "\n";

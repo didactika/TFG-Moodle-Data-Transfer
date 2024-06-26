@@ -13,20 +13,20 @@ class Consumer
         $this->connection = $connection;
     }
 
-    public function execute(string $queue = '', string $exchange = '', string $routing_key = ''): void
+    public function execute(string $queueName = '', string $exchangeName = '', string $routingKey = ''): void
     {
         $channel = $this->connection->get_channel();
 
-        echo " [*] Connection open , channel id: " . json_encode($channel->getChannelId()) . "\n";
+        echo " [*] Connection open, channel id: " . json_encode($channel->getChannelId()) . "\n";
 
-        $channel->queue_declare($queue, true);
-        $channel->queue_bind($queue, $exchange, $routing_key);
+        $channel->queue_declare($queueName, true);
+        $channel->queue_bind($queueName, $exchangeName, $routingKey);
 
         $callback = [Dispatcher::class, 'callback_dispatcher'];
 
-        $channel->basic_qos(null, 2, null);
+        $channel->basic_qos(null, 1, false);
         $channel->basic_consume(
-            $queue,
+            $queueName,
             '',
             false,
             false,
@@ -35,16 +35,29 @@ class Consumer
             $callback
         );
 
-        while ($channel->is_consuming()) {
-            $channel->wait(null, true, 5);
+        $noMoreMessagesFlag = false;
 
-            list($queue, $messageCount) = $channel->queue_declare($queue, true);
+        try {
+            while ($channel->is_consuming()) {
+                $channel->wait(null, true, 5);
 
-            if ($messageCount == 0) {
-                echo " [*] No more messages in the queue. Exiting...\n";
-                break;
+                list($queue, $messageCount) = $channel->queue_declare($queueName, true);
+
+                if ($messageCount == 0) {
+                    if ($noMoreMessagesFlag) {
+                        echo " [*] No more messages in the queue. Exiting...\n";
+                        break;
+                    }
+                    $noMoreMessagesFlag = true;
+                } else {
+                    $noMoreMessagesFlag = false;
+                }
             }
+        } catch (\Exception $e) {
+            echo " [!] An error occurred: " . $e->getMessage() . "\n";
+        } finally {
+            $channel->close();
+            $this->connection->close();
         }
-        $this->connection->close();
     }
 }

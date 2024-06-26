@@ -11,14 +11,75 @@
 
 namespace local_data_transfer\external\rabbitmq;
 
+/**
+ * Class Dispatcher
+ *
+ * A class responsible for dispatching and validating messages.
+ */
 class Dispatcher
 {
-
-    public static function callback_dispatcher($msg)
+   /**
+     * Callback dispatcher method.
+     *
+     * Processes a message and validates its properties before dispatching.
+     *
+     * @param object $msg The message object to process.
+     * @return void
+     */
+    public static function callback_dispatcher(object $msg): void
     {
-        $properties = $msg->getBody();
-        $body = $msg->get_properties();
-        // TODO validate event header in event validator ? 
-        // TODO Get type and redirect 
+        $body = $msg->getBody();
+        $properties = $msg->get_properties();
+
+        if (!(self::validate_properties($properties))) {
+            // TODO: Handle validation errors
+            return;
+        }
+        self::dispatcher($properties, json_decode($body, true));
+        $msg->ack();
+    }
+
+    /**
+     * Validates the properties of a message.
+     *
+     * @param array $properties The properties of the message to validate.
+     * @return bool True if all required properties are present and valid, false otherwise.
+     */
+    private static function validate_properties(array $properties): bool
+    {
+        $required_keys = ['timestamp', 'type', 'content_type'];
+
+        // Check each required key
+        foreach ($required_keys as $key) {
+            if (!array_key_exists($key, $properties)) {
+                echo "Error: Missing key '$key' on message.\n";
+                return false;
+            }
+        }
+
+        // Validate content_type
+        if (!isset($properties['content_type']) || trim(strtolower($properties['content_type'])) !== 'application/json') {
+            echo "Error: The content must have content_type 'application/json'.\n";
+            return false;
+        }
+
+        // Additional validations can be added here as needed
+
+        return true;
+    }
+
+    /**
+     * Dispatcher method.
+     *
+     * Placeholder method for actual dispatching logic based on validated properties and message body.
+     *
+     * @param array $properties The validated properties of the message.
+     * @param mixed $body The body of the message.
+     * @return void
+     */
+    private static function dispatcher(array $properties, array $body): void
+    {
+        print_r($properties);
+        print_r($body);
     }
 }

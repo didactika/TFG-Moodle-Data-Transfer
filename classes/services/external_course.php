@@ -12,8 +12,11 @@ namespace local_data_transfer\services;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . './../../vendor/autoload.php');
-
+use external_api;
+use external_function_parameters;
+use external_value;
+use external_single_structure;
+use external_multiple_structure;
 use local_data_transfer\schema\course\Course;
 
 class external_course extends external_api
