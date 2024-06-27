@@ -9,7 +9,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_data_transfer\import;
+ namespace local_data_transfer\import\events;
 
 use local_data_transfer\external\rabbitmq\Publisher;
 use local_data_transfer\external\rabbitmq\Connection;

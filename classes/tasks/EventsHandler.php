@@ -19,7 +19,7 @@ use local_data_transfer\external\rabbitmq\Consumer;
 
 defined('MOODLE_INTERNAL') || die();
 
-class EventTask extends \core\task\scheduled_task
+class EventsHandler extends \core\task\scheduled_task
 {
     /**
      * Return the task's name as shown in admin screens.

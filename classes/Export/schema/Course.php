@@ -9,7 +9,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_data_transfer\schema\course;
+ namespace local_data_transfer\export\schema;
 
 /**
  * Course class
@@ -40,7 +40,7 @@ class Course
      * @param bool $include_groupings if true, include the course groupings
      */
     public function __construct(
-        int $courseid = 0,
+        int $courseid,
         bool $include_header = true,
         bool $include_content = true,
         bool $include_groups = true,

@@ -9,36 +9,35 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_data_transfer\import;
+namespace local_data_transfer\import\events;
+
+use stdClass;
 
 class EventController
 {
-
-    private $courseuuid;
-
-    private $event_schema;
-
-    private Course $course;
-
-    public function __construct(string $event_schema)
+    /**
+     * Saves a message to the pending commands table.
+     * 
+     * @param int $type The type of the message.
+     * @param object $body The body of the message.
+     * @return int The id of the newly created record.
+     * 
+     */
+    public static function save_to_pending_commands(int $type, array $body): int
     {
-        $this->event_schema = self::convert_to_object($event_schema);
-        $this->courseuuid =  $this->event_schema->courseuuid;
-        $this->course = new Course();
+        global $DB;
+
+        // TODO Validate type and body before saving
+        $record = new stdClass();
+        $record->type = $type;
+        $record->jsondata = json_encode($body);
+        $record->timecreated = date('Y-m-d H:i:s', time());
+        $record->timemodified = date('Y-m-d H:i:s', time());
+
+        if (!$id = $DB->insert_record('pending_commands', $record, false)) {
+            return 0;
+        }
+
+        return $id;
     }
-
-    private static function convert_to_object(string $event_schema): object
-    {
-        return json_decode($event_schema);
-    }
-
-    public function event_new_course()
-    {
-        $this->course::save_to_process_course($this->courseuuid, $this->event_schema);    
-    }
-
-    // public function event_new_groups(){
-    //     $this->course::save_create_groups($this->courseuuid, $this->event_schema);
-    // }
-
 }

@@ -11,6 +11,9 @@
 
 namespace local_data_transfer\external\rabbitmq;
 
+use local_data_transfer\Constants as GlobalConstants;
+use local_data_transfer\import\events\EventController;
+
 /**
  * Class Dispatcher
  *
@@ -49,7 +52,6 @@ class Dispatcher
     {
         $required_keys = ['timestamp', 'type', 'content_type'];
 
-        // Check each required key
         foreach ($required_keys as $key) {
             if (!array_key_exists($key, $properties)) {
                 echo "Error: Missing key '$key' on message.\n";
@@ -57,13 +59,10 @@ class Dispatcher
             }
         }
 
-        // Validate content_type
         if (!isset($properties['content_type']) || trim(strtolower($properties['content_type'])) !== 'application/json') {
             echo "Error: The content must have content_type 'application/json'.\n";
             return false;
         }
-
-        // Additional validations can be added here as needed
 
         return true;
     }
@@ -79,7 +78,19 @@ class Dispatcher
      */
     private static function dispatcher(array $properties, array $body): void
     {
-        print_r($properties);
-        print_r($body);
+        $type = $properties['type'];
+        $appid = get_config('local_data_transfer', 'external_appid');
+
+
+        switch ($type) {
+            case $appid.".course-base-created": 
+                echo " [+] EVENT: COURSE-BASE-CREATED PROCESSING\n";
+                EventController::save_to_pending_commands(GlobalConstants::EVENT_TYPES['COURSE_BASE_CREATED'], $body);
+                break;
+            default:
+                echo "[x] EVENT NOT VALID \n";
+                // TODO Handler not valid events
+                break;
+        }
     }
 }

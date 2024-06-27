@@ -82,6 +82,15 @@ if ($hassiteconfig) {
                 PARAM_RAW
             )
         );
+        $settings->add(
+            new admin_setting_configtext(
+                'local_data_transfer/external_appid', 
+                get_string('setting:external_appid', 'local_data_transfer'),
+                "",
+                "moodle.dominos",
+                PARAM_RAW
+            )
+        );
         $ADMIN->add('localplugins', $settings);
     }
 }

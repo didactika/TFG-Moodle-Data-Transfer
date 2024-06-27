@@ -69,7 +69,7 @@ $msg = new AMQPMessage(
     json_encode($record),
     array(
         'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
-        'type' => 'test.dominos',
+        'type' => 'moodle.dominos.course-base-created',
         'timestamp' => time(),
         'delivery_mode' => 2,
         'content_type' => 'application/json'
@@ -78,15 +78,7 @@ $msg = new AMQPMessage(
 
 
 $channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
-$channel->basic_publish($msg, 'eto');
+
 
 echo ' [x] Sent ', json_encode($record), "\n";
 

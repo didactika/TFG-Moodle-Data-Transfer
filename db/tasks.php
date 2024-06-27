@@ -13,7 +13,16 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        'classname' => 'local_data_transfer\tasks\EventTask',
+        'classname' => 'local_data_transfer\tasks\EventsHandler',
+        'blocking' => 0,
+        'minute' => 0,
+        'hour' => 0,
+        'day' => '*', 
+        'month' => '*',
+        'dayofweek' => 0, 
+    ],
+    [
+        'classname' => 'local_data_transfer\tasks\PendingCommands',
         'blocking' => 0,
         'minute' => 0,
         'hour' => 0,

@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Moodle Course JSON Export/Import Tool';
 
 $string['task:event_task'] = 'Get migration data from external source';
+$string['task:pending_commands'] = 'Process pending commands';
 
 $string['setting:external_rabbitmq_host'] = 'RabbitMQ Host';
 $string['setting:external_rabbitmq_port'] = 'RabbitMQ Port';
@@ -36,3 +37,4 @@ $string['setting:external_rabbitmq_password'] = 'RabbitMQ Password';
 $string['setting:external_rabbitmq_queue'] = 'RabbitMQ Queue';
 $string['setting:external_rabbitmq_exchange'] = 'RabbitMQ Exchange';
 $string['setting:external_rabbitmq_vhost'] = 'RabbitMQ Virtual Host';
+$string['setting:external_appid'] = 'App id';

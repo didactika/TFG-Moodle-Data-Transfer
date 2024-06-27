@@ -17,7 +17,7 @@ use external_function_parameters;
 use external_value;
 use external_single_structure;
 use external_multiple_structure;
-use local_data_transfer\schema\course\Course;
+use local_data_transfer\export\Exporter;
 
 class external_course extends external_api
 {
@@ -54,19 +54,14 @@ class external_course extends external_api
     {
         $params = self::validate_parameters(self::get_course_schema_parameters(), ['courseid' => $courseid, 'includes' => $includes]);
 
-        $course = new Course(
-            $params['courseid'], 
-            $params['includes']['header'], 
-            $params['includes']['content'], 
-            $params['includes']['groups'], 
-            $params['includes']['groupings']
-        );
-
         $opt = [
             'include_mods' => false
         ];
+        
+        $exp = new Exporter($courseid, $params['includes']['header'], $params['includes']['content'], $params['includes']['groups'], $params['includes']['groupings']);
 
-        return $course->get_schema($opt);
+
+        return $exp->get_course_schema($opt);
     }
 
     /**
