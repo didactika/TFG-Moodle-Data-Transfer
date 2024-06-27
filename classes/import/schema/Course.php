@@ -12,6 +12,9 @@
 namespace local_data_transfer\import\schema;
 
 
+require_once(__DIR__ . '/../../../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
+
 /**
  
  * 
@@ -66,5 +69,35 @@ class Course
             $this->course_groupings = new Groupings();
             $this->course_groupings->import_from_json(json_encode($data['groupings']));
         }
+    }
+
+
+    // create a function to see objects and data from this course 
+    public function show_course_data(): void
+    {
+        echo "Course ID: {$this->courseid}\n";
+        echo "Course Header:\n";
+        $this->course_header->show_header_data();
+        echo "Course Content:\n";
+        $this->course_content->show_content_data();
+        echo "Course Groups:\n";
+        $this->course_groups->show_groups_data();
+        echo "Course Groupings:\n";
+        $this->course_groupings->show_groupings_data();
+    }
+
+    public function create_course()
+    {
+
+        $categoryid = 1; // ID de la categoría donde se creará el curso
+
+        $course = new stdClass();
+        $course->fullname = 'Nombre del curso';
+        $course->shortname = 'CursoCorto';
+        $course->category = $categoryid;
+        $course->summary = 'Descripción del curso';
+        $course->format = 'topics'; // o 'weeks', 'social', etc.
+
+        $courseid = create_course($course);
     }
 }

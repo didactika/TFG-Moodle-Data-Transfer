@@ -30,4 +30,9 @@ class Groups
     {
         $this->groups = json_decode($json);
     }
+
+    public function show_groups_data (): void
+    {
+        print_r($this->groups);
+    }
 }

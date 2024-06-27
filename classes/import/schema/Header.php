@@ -31,4 +31,9 @@ class Header
     {
         $this->general = json_decode($json);
     }
+
+    public function show_header_data (): void
+    {
+        print_r($this->general);
+    }
 }

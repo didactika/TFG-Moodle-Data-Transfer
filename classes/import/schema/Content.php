@@ -33,4 +33,9 @@ class Content
             $this->sections[] = (object)$section;
         }
     }
+
+    public function show_content_data (): void
+    {
+        print_r($this->sections);
+    }
 }
