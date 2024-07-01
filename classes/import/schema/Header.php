@@ -29,7 +29,7 @@ class Header
      */
     public function import_from_json(string $json): void
     {
-        $this->general = json_decode($json);
+        $this->general = json_decode($json)->general;
     }
 
     public function show_header_data (): void

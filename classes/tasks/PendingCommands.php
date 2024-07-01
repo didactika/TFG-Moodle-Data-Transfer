@@ -34,25 +34,34 @@ class PendingCommands extends \core\task\scheduled_task
      * Execute the task.
      * 
      * This will retrieve in ascending order all the pending commands from the database and process them.
-     * Important: will proccess in type order
+     * Important: will process in type order
      *   
      */
     public function execute()
     {
         global $DB;
-        if (!$pending_commands = $DB->get_records('pending_commands', null, 'type')) {
+
+        $pending_commands = $DB->get_records('pending_commands', null, 'type');
+        if (empty($pending_commands)) {
             return;
         }
 
-        foreach ($pending_commands as $pending_command) {
-            $type = $pending_command->type;
-            $json = $pending_command->jsondata;
+        $courses = [];
 
-            
-            if ($type == Constants::EVENT_TYPES['COURSE_BASE_CREATED']) {
-                $course = new Course($json);
-                $course->show_course_data();
-            };
+        foreach ($pending_commands as $pending_command) {
+            if ( $pending_command->type == Constants::EVENT_TYPES['COURSE_BASE_CREATED']) {
+                $course = new Course($pending_command->jsondata);
+                $courses[] = $course->get_data_to_create_course();
+            }
+        }
+
+
+
+        print_r($courses);
+
+
+        if (!empty($courses)) {
+            Course::create_courses($courses);
         }
     }
 }

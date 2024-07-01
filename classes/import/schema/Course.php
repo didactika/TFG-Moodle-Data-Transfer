@@ -11,12 +11,16 @@
 
 namespace local_data_transfer\import\schema;
 
-
 require_once(__DIR__ . '/../../../../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
+
+global $CFG;
+require_once($CFG->dirroot . '/course/externallib.php');
+
+use core_course_external;
+use Exception;
+
 
 /**
- 
  * 
  * A class responsible for importing course data from JSON.
  */
@@ -24,9 +28,6 @@ class Course
 {
     public int $courseid;
     public ?Header $course_header = null;
-    public ?Content $course_content = null;
-    public ?Groups $course_groups = null;
-    public ?Groupings $course_groupings = null;
 
     /**
      * Constructor
@@ -54,50 +55,37 @@ class Course
             $this->course_header = new Header();
             $this->course_header->import_from_json(json_encode($data['header']));
         }
-
-        if (isset($data['content'])) {
-            $this->course_content = new Content();
-            $this->course_content->import_from_json(json_encode($data['content']));
-        }
-
-        if (isset($data['groups'])) {
-            $this->course_groups = new Groups();
-            $this->course_groups->import_from_json(json_encode($data['groups']));
-        }
-
-        if (isset($data['groupings'])) {
-            $this->course_groupings = new Groupings();
-            $this->course_groupings->import_from_json(json_encode($data['groupings']));
-        }
     }
 
-
-    // create a function to see objects and data from this course 
-    public function show_course_data(): void
+    /**
+     * Get course data to create the course
+     * 
+     * @return array
+     */
+    public function get_data_to_create_course(): array
     {
-        echo "Course ID: {$this->courseid}\n";
-        echo "Course Header:\n";
-        $this->course_header->show_header_data();
-        echo "Course Content:\n";
-        $this->course_content->show_content_data();
-        echo "Course Groups:\n";
-        $this->course_groups->show_groups_data();
-        echo "Course Groupings:\n";
-        $this->course_groupings->show_groupings_data();
+        return [
+            'fullname' => $this->course_header->general->fullname,
+            'shortname' => $this->course_header->general->shortname,
+            'categoryid' => $this->course_header->general->category,
+            'idnumber' => $this->course_header->general->idnumber,
+        ];
     }
 
-    public function create_course()
+    /**
+     * Create a course in Moodle
+     * 
+     * @param array $courses Array of courses to create
+     */
+    public static function create_courses(array $courses): void
     {
-
-        $categoryid = 1; // ID de la categoría donde se creará el curso
-
-        $course = new stdClass();
-        $course->fullname = 'Nombre del curso';
-        $course->shortname = 'CursoCorto';
-        $course->category = $categoryid;
-        $course->summary = 'Descripción del curso';
-        $course->format = 'topics'; // o 'weeks', 'social', etc.
-
-        $courseid = create_course($course);
+        try {
+            $created_courses = core_course_external::create_courses($courses);
+            foreach ($created_courses as $created_course) {
+                echo "Created course with ID: {$created_course['id']}\n";
+            }
+        } catch (Exception $e) {
+            echo "Error creating course: " . $e->getMessage() . "\n";
+        }
     }
 }
