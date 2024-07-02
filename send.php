@@ -11,7 +11,7 @@ $channel = $connection->channel();
 $channel->queue_declare('task_queue', false, true, false, false);
 
 $record = [
-    "courseid" => 2,
+    "uuid" => '40aa0418-aa9a-5fe0-85d2-77c34e29736b',
     "header" => [
         "general" => [
             "category" => 2,
@@ -20,47 +20,47 @@ $record = [
             "idnumber" => "40aa0418-aa9a-5fe0-85d2-77c34e29736b||2021"
         ]
     ],
-    "content" => [
-        "sections" => [
-            [
-                "id" => 1,
-                "section" => 0,
-                "name" => null,
-                "visible" => 1,
-                "availability" => null
-            ],
-            [
-                "id" => 2,
-                "section" => 1,
-                "name" => null,
-                "visible" => 1,
-                "availability" => null
-            ],
-            [
-                "id" => 3,
-                "section" => 2,
-                "name" => null,
-                "visible" => 1,
-                "availability" => null
-            ],
-            [
-                "id" => 4,
-                "section" => 3,
-                "name" => null,
-                "visible" => 1,
-                "availability" => null
-            ],
-            [
-                "id" => 5,
-                "section" => 4,
-                "name" => null,
-                "visible" => 1,
-                "availability" => null
-            ]
-        ]
-    ],
-    "groups" => [],
-    "groupings" => []
+    // "content" => [
+    //     "sections" => [
+    //         [
+    //             "id" => 1,
+    //             "section" => 0,
+    //             "name" => null,
+    //             "visible" => 1,
+    //             "availability" => null
+    //         ],
+    //         [
+    //             "id" => 2,
+    //             "section" => 1,
+    //             "name" => null,
+    //             "visible" => 1,
+    //             "availability" => null
+    //         ],
+    //         [
+    //             "id" => 3,
+    //             "section" => 2,
+    //             "name" => null,
+    //             "visible" => 1,
+    //             "availability" => null
+    //         ],
+    //         [
+    //             "id" => 4,
+    //             "section" => 3,
+    //             "name" => null,
+    //             "visible" => 1,
+    //             "availability" => null
+    //         ],
+    //         [
+    //             "id" => 5,
+    //             "section" => 4,
+    //             "name" => null,
+    //             "visible" => 1,
+    //             "availability" => null
+    //         ]
+    //     ]
+    // ],
+    // "groups" => [],
+    // "groupings" => []
 ];
 
 
@@ -77,6 +77,7 @@ $msg = new AMQPMessage(
 );
 
 
+$channel->basic_publish($msg, 'eto');
 $channel->basic_publish($msg, 'eto');
 
 

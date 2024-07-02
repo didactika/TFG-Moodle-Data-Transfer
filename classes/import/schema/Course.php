@@ -11,32 +11,26 @@
 
 namespace local_data_transfer\import\schema;
 
-require_once(__DIR__ . '/../../../../../config.php');
-
-global $CFG;
-require_once($CFG->dirroot . '/course/externallib.php');
-
-use core_course_external;
-use Exception;
-
-
 /**
  * 
  * A class responsible for importing course data from JSON.
  */
 class Course
 {
-    public int $courseid;
+    public string $uuid;
+    public int $recordid;
     public ?Header $course_header = null;
+    public ?array $errors = null;
 
     /**
      * Constructor
      * 
      * @param string $json JSON string containing course data
      */
-    public function __construct(string $json)
+    public function __construct(string $json, $recordid = null)
     {
-        $this->import_from_json($json);
+        $this->set_from_json($json);
+        $this->recordid = $recordid;
     }
 
     /**
@@ -45,11 +39,16 @@ class Course
      * @param string $json JSON string containing course data
      * @return void
      */
-    public function import_from_json(string $json): void
+    public function set_from_json(string $json): void
     {
         $data = json_decode($json, true);
 
-        $this->courseid = $data['courseid'] ?? 0;
+        if (!isset($data['uuid'])) {
+            $errors[] = 'Course uuid is not set';
+            return;
+        }
+
+        $this->uuid = $data['uuid'];
 
         if (isset($data['header'])) {
             $this->course_header = new Header();
@@ -64,6 +63,13 @@ class Course
      */
     public function get_data_to_create_course(): array
     {
+        // verify if exist error, send event and delete from db then return empty array to process in pending commands
+        if ($this->errors || !$this->is_valid_data()) {
+            print_r("VALID DATA" . $this->is_valid_data());
+            echo "Error in course data\n";
+            return [];
+        }
+
         return [
             'fullname' => $this->course_header->general->fullname,
             'shortname' => $this->course_header->general->shortname,
@@ -72,20 +78,37 @@ class Course
         ];
     }
 
-    /**
-     * Create a course in Moodle
-     * 
-     * @param array $courses Array of courses to create
-     */
-    public static function create_courses(array $courses): void
+
+
+    public function is_valid_data()
     {
-        try {
-            $created_courses = core_course_external::create_courses($courses);
-            foreach ($created_courses as $created_course) {
-                echo "Created course with ID: {$created_course['id']}\n";
-            }
-        } catch (Exception $e) {
-            echo "Error creating course: " . $e->getMessage() . "\n";
+        global $DB;
+        $errors = [];
+
+        if (!$this->course_header) {
+            $errors[] = 'Course header is not set';
         }
+
+        $errors[]  = $this->course_header->is_valid_data($errors);
+
+        if ($DB->record_exists('course', ['shortname' => $this->course_header->general->shortname])) {
+            $errors[] = "Shortname ({$this->course_header->general->shortname}) is already taken.";
+        }
+
+        if ($DB->record_exists('course', ['fullname' => $this->course_header->general->fullname])) {
+            $errors[] = "fullname ({$this->course_header->general->fullname}) is already taken.";
+        }
+
+        if ($DB->record_exists('course', ['idnumber' => $this->course_header->general->idnumber])) {
+            $errors[] = "idnumber ({$this->course_header->general->idnumber}) is already taken.";
+        }
+
+
+
+        if (!empty($errors)) {
+            return false;
+        }
+
+        return true;
     }
 }

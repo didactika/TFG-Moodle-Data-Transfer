@@ -11,8 +11,7 @@
 
 namespace local_data_transfer\tasks;
 
-use local_data_transfer\Constants;
-use local_data_transfer\import\schema\Course;
+use local_data_transfer\import\PendingCommands as dispatcher; 
 
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
@@ -39,29 +38,8 @@ class PendingCommands extends \core\task\scheduled_task
      */
     public function execute()
     {
-        global $DB;
-
-        $pending_commands = $DB->get_records('pending_commands', null, 'type');
-        if (empty($pending_commands)) {
-            return;
-        }
-
-        $courses = [];
-
-        foreach ($pending_commands as $pending_command) {
-            if ( $pending_command->type == Constants::EVENT_TYPES['COURSE_BASE_CREATED']) {
-                $course = new Course($pending_command->jsondata);
-                $courses[] = $course->get_data_to_create_course();
-            }
-        }
-
-
-
-        print_r($courses);
-
-
-        if (!empty($courses)) {
-            Course::create_courses($courses);
-        }
+        $commands = new dispatcher();
+        $commands->dispatcher();
+        // $commands->execute();
     }
 }

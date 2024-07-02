@@ -32,8 +32,30 @@ class Header
         $this->general = json_decode($json)->general;
     }
 
-    public function show_header_data (): void
+
+    /**
+     * Check if the data is valid
+     * 
+     * @return bool
+     */
+    public function is_valid_data($errors) 
     {
-        print_r($this->general);
+        if(!$this->general->fullname){
+            $errors[] = 'Course fullname is not set';
+        }
+
+        if(!$this->general->shortname){
+            $errors[] = 'Course shortname is not set';
+        }
+
+        if(!$this->general->category){
+            $errors[] = 'Course category id is not set';
+        }
+
+        if(!$this->general->idnumber){
+            $errors[] = 'Course idnumber is not set';
+        }
+
+        return $errors;
     }
 }
