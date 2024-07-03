@@ -8,16 +8,15 @@ use PhpAmqpLib\Message\AMQPMessage;
 $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
 $channel = $connection->channel();
 
-$channel->queue_declare('task_queue', false, true, false, false);
 
 $record = [
-    "uuid" => '40aa0418-aa9a-5fe0-85d2-77c34e29736b',
+    "uuid" => '40aa0418-aa9a-5fe0-85d2-77c34e29731b',
     "header" => [
         "general" => [
             "category" => 2,
-            "fullname" => "SNCNC1-2021",
-            "shortname" => "SNCNC1-2021",
-            "idnumber" => "40aa0418-aa9a-5fe0-85d2-77c34e29736b||2021"
+            "fullname" => "SNCNC1-2023",
+            "shortname" => "SNCNC1-2023",
+            "idnumber" => "40aa0418-aa9a-5fe0-85d2-77c34e29731b||SNCNC1-2023"
         ]
     ],
     // "content" => [
@@ -77,7 +76,6 @@ $msg = new AMQPMessage(
 );
 
 
-$channel->basic_publish($msg, 'eto');
 $channel->basic_publish($msg, 'eto');
 
 

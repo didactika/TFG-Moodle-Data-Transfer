@@ -21,7 +21,7 @@ use local_data_transfer\import\events\EventController;
  */
 class Dispatcher
 {
-   /**
+    /**
      * Callback dispatcher method.
      *
      * Processes a message and validates its properties before dispatching.
@@ -80,16 +80,17 @@ class Dispatcher
     {
         $type = $properties['type'];
         $appid = get_config('local_data_transfer', 'external_appid');
-
-
+        
         switch ($type) {
-            case $appid.".course-base-created": 
+            case $appid . ".course-base-created":
                 echo " [+] EVENT: COURSE-BASE-CREATED PROCESSING\n";
-                EventController::save_to_pending_commands(GlobalConstants::EVENT_TYPES['COURSE_BASE_CREATED'], $body);
+                EventController::save_to_pending_commands(GlobalConstants::EVENT_TYPES["COURSE_BASE_CREATED"], $body);
+                break;
+            case $appid . ".course-section-created":
+                echo " [+] EVENT: COURSE_SECTION_CREATED PROCESSING\n";
+                EventController::save_to_pending_commands(GlobalConstants::EVENT_TYPES["COURSE_SECTION_CREATED"], $body);
                 break;
             default:
-                echo "[x] EVENT NOT VALID \n";
-                // TODO Handler not valid events
                 break;
         }
     }

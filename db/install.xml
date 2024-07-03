@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <XMLDB PATH="local/data_transfer/db" VERSION="2024010100" COMMENT="Saving pending events">
     <TABLES>
-        <TABLE NAME="pending_commands" COMMENT="Store pending events">
+        <TABLE NAME="transfer_pending_commands" COMMENT="Store pending events">
             <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"
-                    COMMENT="Primary Key" />
-                <FIELD NAME="type" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"
-                    COMMENT="Type of JSON data" />
-                <FIELD NAME="jsondata" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false"
-                    COMMENT="JSON data" />
-                <FIELD NAME="timecreated" TYPE="datetime" NOTNULL="true" SEQUENCE="false"
-                    COMMENT="Time created" />
-                <FIELD NAME="timemodified" TYPE="datetime" NOTNULL="true" SEQUENCE="false"
-                    COMMENT="Time modified" />
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Primary Key" />
+                <FIELD NAME="type" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Type of JSON data" />
+                <FIELD NAME="jsondata" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="JSON data" />
+                <FIELD NAME="timecreated" TYPE="datetime" NOTNULL="true" SEQUENCE="false" COMMENT="Time created" />
+                <FIELD NAME="timemodified" TYPE="datetime" NOTNULL="true" SEQUENCE="false" COMMENT="Time modified" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="transfer_course_created" COMMENT="Store created course events">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Primary Key" />
+                <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course ID created in task process" />
+                <FIELD NAME="migrationuuid" TYPE="text" LENGTH="36" NOTNULL="true" SEQUENCE="false" COMMENT="UUID of the creation process" />
+                <FIELD NAME="timecreated" TYPE="datetime" NOTNULL="true" SEQUENCE="false" COMMENT="Time created" />
+                <FIELD NAME="timemodified" TYPE="datetime" NOTNULL="true" SEQUENCE="false" COMMENT="Time modified" />
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />

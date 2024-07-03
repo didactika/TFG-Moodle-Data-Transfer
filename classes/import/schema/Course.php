@@ -5,14 +5,14 @@
  *
  * @package     local_data_transfer
  * @category    Importer
- * @copyright   Franklin López
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_data_transfer\import\schema;
 
+use local_data_transfer\import\events\PublisherController;
+
 /**
- * 
  * A class responsible for importing course data from JSON.
  */
 class Course
@@ -20,17 +20,19 @@ class Course
     public string $uuid;
     public int $recordid;
     public ?Header $course_header = null;
-    public ?array $errors = null;
+    public array $errors = [];
+    private $courseid = null;
 
     /**
      * Constructor
      * 
+     * @param int $recordid ID of the record
      * @param string $json JSON string containing course data
      */
-    public function __construct(string $json, $recordid = null)
+    public function __construct(int $recordid, string $json)
     {
-        $this->set_from_json($json);
         $this->recordid = $recordid;
+        $this->set_from_json($json);
     }
 
     /**
@@ -44,15 +46,16 @@ class Course
         $data = json_decode($json, true);
 
         if (!isset($data['uuid'])) {
-            $errors[] = 'Course uuid is not set';
-            return;
+            $this->errors[] = 'Course uuid is not set';
+        } else {
+            $this->uuid = $data['uuid'];
         }
-
-        $this->uuid = $data['uuid'];
 
         if (isset($data['header'])) {
             $this->course_header = new Header();
             $this->course_header->import_from_json(json_encode($data['header']));
+        } else {
+            $this->errors[] = 'Course header is not set';
         }
     }
 
@@ -63,10 +66,9 @@ class Course
      */
     public function get_data_to_create_course(): array
     {
-        // verify if exist error, send event and delete from db then return empty array to process in pending commands
-        if ($this->errors || !$this->is_valid_data()) {
-            print_r("VALID DATA" . $this->is_valid_data());
-            echo "Error in course data\n";
+        // Verify if exist error, send event and delete from db then return empty array to process in pending commands
+        if (!$this->is_valid_data()) {
+            $this->fail_creation();
             return [];
         }
 
@@ -78,37 +80,72 @@ class Course
         ];
     }
 
-
-
-    public function is_valid_data()
+    /**
+     * Mark course creation as successful
+     * 
+     * @param int $courseid ID of the created course
+     * @return void
+     */
+    public function succes_creation(int $courseid): void
     {
         global $DB;
-        $errors = [];
+        $DB->delete_records('transfer_pending_commands', ['id' => $this->recordid]);
+        $this->courseid = $courseid;
+        
+        $record = [
+            "courseid" => $courseid,
+            "migrationuuid" => $this->uuid,
+            "timecreated" => date('Y-m-d H:i:s', time()),
+            "timemodified" => date('Y-m-d H:i:s', time())
+        ]; 
+
+        $DB->insert_record('transfer_course_created', $record, false);
+
+        // Send success event
+        $publisher = new PublisherController();
+        $publisher->success_message(['courseid' => $courseid], 'Course creation successful.');
+    }
+
+    /**
+     * Mark course creation as failed
+     * 
+     * @return void
+     */
+    public function fail_creation(): void
+    {
+        // Send error event
+        $publisher = new PublisherController();
+        $publisher->error_message($this->errors, 'Course creation failed. in record id: ' . $this->recordid);
+    }
+
+    /**
+     * Validate course data
+     * 
+     * @return bool
+     */
+    public function is_valid_data(): bool
+    {
+        global $DB;
 
         if (!$this->course_header) {
-            $errors[] = 'Course header is not set';
-        }
-
-        $errors[]  = $this->course_header->is_valid_data($errors);
-
-        if ($DB->record_exists('course', ['shortname' => $this->course_header->general->shortname])) {
-            $errors[] = "Shortname ({$this->course_header->general->shortname}) is already taken.";
-        }
-
-        if ($DB->record_exists('course', ['fullname' => $this->course_header->general->fullname])) {
-            $errors[] = "fullname ({$this->course_header->general->fullname}) is already taken.";
-        }
-
-        if ($DB->record_exists('course', ['idnumber' => $this->course_header->general->idnumber])) {
-            $errors[] = "idnumber ({$this->course_header->general->idnumber}) is already taken.";
-        }
-
-
-
-        if (!empty($errors)) {
+            $this->errors[] = 'Course header is not set';
             return false;
         }
 
-        return true;
+        $this->errors = array_merge($this->errors, $this->course_header->is_valid_data());
+
+        if ($DB->record_exists('course', ['shortname' => $this->course_header->general->shortname])) {
+            $this->errors[] = "Shortname ({$this->course_header->general->shortname}) is already taken.";
+        }
+
+        if ($DB->record_exists('course', ['fullname' => $this->course_header->general->fullname])) {
+            $this->errors[] = "Fullname ({$this->course_header->general->fullname}) is already taken.";
+        }
+
+        if ($DB->record_exists('course', ['idnumber' => $this->course_header->general->idnumber])) {
+            $this->errors[] = "ID number ({$this->course_header->general->idnumber}) is already taken.";
+        }
+
+        return empty($this->errors);
     }
 }

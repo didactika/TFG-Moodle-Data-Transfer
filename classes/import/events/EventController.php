@@ -34,7 +34,7 @@ class EventController
         $record->timecreated = date('Y-m-d H:i:s', time());
         $record->timemodified = date('Y-m-d H:i:s', time());
 
-        if (!$id = $DB->insert_record('pending_commands', $record, false)) {
+        if (!$id = $DB->insert_record('transfer_pending_commands', $record, false)) {
             return 0;
         }
 

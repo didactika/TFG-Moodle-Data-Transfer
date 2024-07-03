@@ -40,6 +40,6 @@ class PendingCommands extends \core\task\scheduled_task
     {
         $commands = new dispatcher();
         $commands->dispatcher();
-        // $commands->execute();
+        $commands->execute();
     }
 }

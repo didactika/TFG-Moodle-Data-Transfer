@@ -11,13 +11,13 @@
 
 namespace local_data_transfer\import;
 
-use local_data_transfer\Constants;
-use local_data_transfer\import\schema\Course;
-
 require_once(__DIR__ . '/../../../../config.php');
-
 global $CFG;
 require_once($CFG->dirroot . '/course/externallib.php');
+
+use local_data_transfer\Constants;
+use local_data_transfer\import\schema\Course;
+use core_course_external;
 
 
 class PendingCommands
@@ -25,17 +25,10 @@ class PendingCommands
 
     public $courses;
 
-    public $messages;
-
-    public $errors;
 
     public function __construct()
     {
         $this->courses = [];
-
-        $this->messages = [];
-
-        $this->errors = [];
     }
 
 
@@ -45,16 +38,14 @@ class PendingCommands
 
         foreach ($pending_commands as $pending_command) {
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_BASE_CREATED']) {
-                $course = new Course($pending_command->jsondata, $pending_command->id);
-                $course_data = $course->get_data_to_create_course();
-                // print_r($course_data);
-                if (!empty($course_data)) {
-                    $this->courses[] = $course_data;
-                }
+                $this->courses[] =  new Course($pending_command->id, $pending_command->jsondata);
             }
         }
     }
 
+    /**
+     * Execute the pending commands
+     */
     public function execute()
     {
         $this->executer_courses();
@@ -68,7 +59,7 @@ class PendingCommands
     private function get_pending_commands()
     {
         global $DB;
-        return $DB->get_records('pending_commands', null, 'type');
+        return $DB->get_records('transfer_pending_commands', null, 'type');
     }
 
     /**
@@ -78,20 +69,23 @@ class PendingCommands
      * 
      * @return array
      */
-    private function executer_courses(): array
+    private function executer_courses(): void
     {
+        if (empty($this->courses)) {
+            echo "[/] No courses to process.\n";
+            return;
+        }
         try {
-
-            $created_courses = core_course_external::create_courses($this->courses);
-
-            foreach ($created_courses as $created_course) {
-                echo "Created course with ID: {$created_course['id']}\n";
-                $messages[] = "Created course with ID: {$created_course['id']}";
+            foreach ($this->courses as $index => $course) {
+                $course_data = $course->get_data_to_create_course();
+                if (empty($course_data)) {
+                    continue;
+                }
+                $created_course = core_course_external::create_courses([$course_data]);
+                $course->succes_creation($created_course[0]['id']);
             }
         } catch (Exception $e) {
-            echo "Error creating course: {$e->getMessage()}\n";
+            error_log("Error creating course: {$e->getMessage()}");
         }
-
-        return $messages;
     }
 }

@@ -36,23 +36,25 @@ class Header
     /**
      * Check if the data is valid
      * 
-     * @return bool
+     * @return array
      */
-    public function is_valid_data($errors) 
+    public function is_valid_data(): array
     {
-        if(!$this->general->fullname){
+        $errors = [];
+
+        if (empty($this->general->fullname)) {
             $errors[] = 'Course fullname is not set';
         }
 
-        if(!$this->general->shortname){
+        if (empty($this->general->shortname)) {
             $errors[] = 'Course shortname is not set';
         }
 
-        if(!$this->general->category){
+        if (empty($this->general->category)) {
             $errors[] = 'Course category id is not set';
         }
 
-        if(!$this->general->idnumber){
+        if (empty($this->general->idnumber)) {
             $errors[] = 'Course idnumber is not set';
         }
 
