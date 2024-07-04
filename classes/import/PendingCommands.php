@@ -17,6 +17,7 @@ require_once($CFG->dirroot . '/course/externallib.php');
 
 use local_data_transfer\Constants;
 use local_data_transfer\import\schema\Course;
+use local_data_transfer\import\schema\Sections;
 use core_course_external;
 
 
@@ -24,11 +25,13 @@ class PendingCommands
 {
 
     public $courses;
+    public $sections;
 
 
     public function __construct()
     {
         $this->courses = [];
+        $this->sections = [];
     }
 
 
@@ -37,8 +40,12 @@ class PendingCommands
         $pending_commands = $this->get_pending_commands();
 
         foreach ($pending_commands as $pending_command) {
+
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_BASE_CREATED']) {
                 $this->courses[] =  new Course($pending_command->id, $pending_command->jsondata);
+            }
+            if ($pending_command->type == Constants::EVENT_TYPES['COURSE_SECTION_CREATED']) {
+                $this->sections[] = new Sections($pending_command->id, $pending_command->jsondata);
             }
         }
     }
@@ -49,6 +56,7 @@ class PendingCommands
     public function execute()
     {
         $this->executer_courses();
+        $this->executer_sections();
     }
 
     /**
@@ -82,10 +90,31 @@ class PendingCommands
                     continue;
                 }
                 $created_course = core_course_external::create_courses([$course_data]);
-                $course->succes_creation($created_course[0]['id']);
+                $course->set_courseid($created_course[0]['id']);
+                $course->success();
             }
         } catch (Exception $e) {
             error_log("Error creating course: {$e->getMessage()}");
+        }
+    }
+
+
+    /**
+     * Create sections in Moodle
+     * 
+     */
+    private function executer_sections(): void
+    {
+        if (empty($this->sections)) {
+            echo "[/] No sections to process.\n";
+            return;
+        }
+        try {
+            foreach ($this->sections as $section) {
+                $section->create_sections();
+            }
+        } catch (Exception $e) {
+            error_log("Error creating sections: {$e->getMessage()}");
         }
     }
 }

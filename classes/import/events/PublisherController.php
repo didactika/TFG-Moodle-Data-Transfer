@@ -92,15 +92,21 @@ class PublisherController
      *
      * @param array $errors The array of errors.
      * @param string $message The error message.
+     * @param array $data The array of data Optional.
      * @return void
      */
-    public function error_message(array $errors, string $message): void
+    public function error_message(array $errors, string $message , array $data = []): void
     {
         $record = [
             'message' => $message,
             'errors' => $errors,
-            'timecreated' => time(),
         ];
+
+        if (!empty($data)) {
+            $record['data'] = $data;
+        }
+
+        $record['timecreated'] = time();
 
         $msg = $this->create_message($record, 'error');
         $this->send_message($msg);        
