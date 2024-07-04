@@ -110,35 +110,35 @@ $testCourse = [
         "idnumber" => "2c3d4e5f-6a7b-8c9d-0e1f-2d3c4b5a6e7f||LIT909-2023-fall",
     ]    
 ];
+z
 
+// foreach ($testCourse as $course) {
+//     echo "Sending course: " . $course['shortname'] . "\n";
+//     $record = [
+//         "uuid" => $course['uuid'],
+//         "header" => [
+//             "general" => [
+//                 "category" => 5,
+//                 "fullname" => "SNCNC1-2023-test",
+//                 "shortname" => $course['shortname'],
+//                 "idnumber" => $course['idnumber'],
+//             ]
+//         ],
+//     ];
 
-foreach ($testCourse as $course) {
-    echo "Sending course: " . $course['shortname'] . "\n";
-    $record = [
-        "uuid" => $course['uuid'],
-        "header" => [
-            "general" => [
-                "category" => 5,
-                "fullname" => "SNCNC1-2023-test",
-                "shortname" => $course['shortname'],
-                "idnumber" => $course['idnumber'],
-            ]
-        ],
-    ];
+//     $msg = new AMQPMessage(
+//         json_encode($record),
+//         array(
+//             'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
+//             'type' => 'moodle.dominos.course-base-created',
+//             'timestamp' => time(),
+//             'delivery_mode' => 2,
+//             'content_type' => 'application/json'
+//         )
+//     );
 
-    $msg = new AMQPMessage(
-        json_encode($record),
-        array(
-            'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
-            'type' => 'moodle.dominos.course-base-created',
-            'timestamp' => time(),
-            'delivery_mode' => 2,
-            'content_type' => 'application/json'
-        )
-    );
-
-    $channel->basic_publish($msg, 'eto');
-}
+//     $channel->basic_publish($msg, 'eto');
+// }
 
 
 
