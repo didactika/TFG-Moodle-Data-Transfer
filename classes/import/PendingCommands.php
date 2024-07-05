@@ -50,6 +50,7 @@ class PendingCommands
 
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_BASE_CREATED']) {
                 $this->courses[] =  new Course($pending_command->id, $pending_command->jsondata);
+                $this->executer_courses();
             }
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_SECTION_CREATED']) {
                 $this->sections[] = new Sections($pending_command->id, $pending_command->jsondata);
@@ -68,7 +69,6 @@ class PendingCommands
      */
     public function execute()
     {
-        $this->executer_courses();
         $this->executer_sections();
         $this->executer_groups();
         $this->executer_groupings();

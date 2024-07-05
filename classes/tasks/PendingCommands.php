@@ -17,7 +17,7 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-class PendingCommands extends \core\task\scheduled_task
+class PendingCommands extends \core\task\scheduled_task 
 {
     /**
      * Return the task's name as shown in admin screens.

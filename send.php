@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$connection = new AMQPStreamConnection('172.22.20.197', 5672, 'root', 'U3Enm77b6fCiRFUwxDa3');
 $channel = $connection->channel();
 
 // $testCourse = [
@@ -144,7 +144,7 @@ foreach ($testCourse as $course) {
         )
     );
 
-    $channel->basic_publish($msg, 'eto');
+    $channel->basic_publish($msg, 'dominos');
 }
 
 
@@ -205,7 +205,7 @@ $msg = new AMQPMessage(
     )
 );
 
-$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'dominos');
 
 $record = [
     "uuid" => 'f987aab8-7bc0-4f67-8a89-1f342e50d5f1',
@@ -250,7 +250,7 @@ $msg = new AMQPMessage(
 );
 
 
-$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'dominos');
 
 
 $record = [
@@ -296,7 +296,7 @@ $msg = new AMQPMessage(
 );
 
 
-$channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'dominos');
 
 
 $channel->close();
