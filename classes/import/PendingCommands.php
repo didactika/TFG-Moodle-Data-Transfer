@@ -18,20 +18,27 @@ require_once($CFG->dirroot . '/course/externallib.php');
 use local_data_transfer\Constants;
 use local_data_transfer\import\schema\Course;
 use local_data_transfer\import\schema\Sections;
-use core_course_external;
+use local_data_transfer\import\schema\Groups;
+use local_data_transfer\import\schema\Groupings;
 
+use core_course_external;
+use Exception;
 
 class PendingCommands
 {
 
     public $courses;
     public $sections;
+    public $groups;
+    public $groupings;
 
 
     public function __construct()
     {
         $this->courses = [];
         $this->sections = [];
+        $this->groups = [];
+        $this->groupings = [];
     }
 
 
@@ -47,6 +54,12 @@ class PendingCommands
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_SECTION_CREATED']) {
                 $this->sections[] = new Sections($pending_command->id, $pending_command->jsondata);
             }
+            if ($pending_command->type == Constants::EVENT_TYPES['COURSE_GROUPS_CREATED']) {
+                $this->groups[] = new Groups($pending_command->id, $pending_command->jsondata);
+            }
+            if ($pending_command->type == Constants::EVENT_TYPES['COURSE_GROUPINGS_CREATED']) {
+                $this->groupings[] = new Groupings($pending_command->id, $pending_command->jsondata);
+            }
         }
     }
 
@@ -57,6 +70,8 @@ class PendingCommands
     {
         $this->executer_courses();
         $this->executer_sections();
+        $this->executer_groups();
+        $this->executer_groupings();
     }
 
     /**
@@ -115,6 +130,44 @@ class PendingCommands
             }
         } catch (Exception $e) {
             error_log("Error creating sections: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Create groups in Moodle
+     * 
+     */
+    private function executer_groups(): void
+    {
+        if (empty($this->groups)) {
+            echo "[/] No groups to process.\n";
+            return;
+        }
+        try {
+            foreach ($this->groups as $group) {
+                $group->create_groups();
+            }
+        } catch (Exception $e) {
+            error_log("Error creating groups: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Create groupings in Moodle
+     * 
+     */
+    private function executer_groupings(): void
+    {
+        if (empty($this->groupings)) {
+            echo "[/] No groupings to process.\n";
+            return;
+        }
+        try {
+            foreach ($this->groupings as $grouping) {
+                $grouping->create_groupings();
+            }
+        } catch (Exception $e) {
+            error_log("Error creating groupings: {$e->getMessage()}");
         }
     }
 }

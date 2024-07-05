@@ -108,9 +108,9 @@ $testCourse = [
         "shortname" => "LIT909-2023-fall",
         "uuid" => "2c3d4e5f-6a7b-8c9d-0e1f-2d3c4b5a6e7f",
         "idnumber" => "2c3d4e5f-6a7b-8c9d-0e1f-2d3c4b5a6e7f||LIT909-2023-fall",
-    ]    
+    ]
 ];
-z
+
 
 // foreach ($testCourse as $course) {
 //     echo "Sending course: " . $course['shortname'] . "\n";
@@ -187,20 +187,80 @@ z
 //     ]
 // ];
 
+// $record = [
+//     "uuid" => 'f987aab8-7bc0-4f67-8a89-1f342e50d5f1',
+//     "groups" => [
+//         [
+//             "name" => "aaaaa",
+//             "idnumber" => "aaaa",
+//             "description" => "<p dir=\"ltr\" style=\"text-align: left;\">aaaa</p>"
+//         ],
+//         [
+//             "name" => "bbbbb",
+//             "idnumber" => "bbbb",
+//             "description" => "<p dir=\"ltr\" style=\"text-align: left;\">bbbb</p>"
+//         ],
+//         [
+//             "name" => "ccccc",
+//             "idnumber" => "cccc",
+//             "description" => "<p dir=\"ltr\" style=\"text-align: left;\">cccc</p>"
+//         ],
+//         [
+//             "name" => "ddddd",
+//             "idnumber" => "dddd",
+//             "description" => "<p dir=\"ltr\" style=\"text-align: left;\">dddd</p>"
+//         ],
+//         [
+//             "name" => "eeeee",
+//             "idnumber" => "eeee",
+//             "description" => "<p dir=\"ltr\" style=\"text-align: left;\">eeee</p>"
+//         ]
+//     ]
+// ];
+$record = [
+    "uuid" => 'f987aab8-7bc0-4f67-8a89-1f342e50d5f1',
+    "groupings" => [
+        [
+            "name" => "aaaaa",
+            "idnumber" => "aaaa",
+            "description" => "<p dir=\"ltr\" style=\"text-align: left;\">aaaa</p>"
+        ],
+        [
+            "name" => "bbbbb",
+            "idnumber" => "bbbb",
+            "description" => "<p dir=\"ltr\" style=\"text-align: left;\">bbbb</p>"
+        ],
+        [
+            "name" => "ccccc",
+            "idnumber" => "cccc",
+            "description" => "<p dir=\"ltr\" style=\"text-align: left;\">cccc</p>"
+        ],
+        [
+            "name" => "ddddd",
+            "idnumber" => "dddd",
+            "description" => "<p dir=\"ltr\" style=\"text-align: left;\">dddd</p>"
+        ],
+        [
+            "name" => "eeeee",
+            "idnumber" => "eeee",
+            "description" => "<p dir=\"ltr\" style=\"text-align: left;\">eeee</p>"
+        ]
+    ]
+];
 
-// $msg = new AMQPMessage(
-//     json_encode($record),
-//     array(
-//         'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
-//         'type' => 'moodle.dominos.course-section-created',
-//         'timestamp' => time(),
-//         'delivery_mode' => 2,
-//         'content_type' => 'application/json'
-//     )
-// );
+$msg = new AMQPMessage(
+    json_encode($record),
+    array(
+        'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
+        'type' => 'moodle.dominos.course-groupings-created',
+        'timestamp' => time(),
+        'delivery_mode' => 2,
+        'content_type' => 'application/json'
+    )
+);
 
 
-// $channel->basic_publish($msg, 'eto');
+$channel->basic_publish($msg, 'eto');
 
 
 $channel->close();

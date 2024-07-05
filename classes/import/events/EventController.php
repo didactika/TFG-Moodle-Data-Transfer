@@ -27,7 +27,6 @@ class EventController
     {
         global $DB;
 
-        // TODO Validate type and body before saving
         $record = new stdClass();
         $record->type = $type;
         $record->jsondata = json_encode($body);

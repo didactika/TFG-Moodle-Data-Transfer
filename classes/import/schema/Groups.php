@@ -11,6 +11,11 @@
 
 namespace local_data_transfer\import\schema;
 
+require_once(__DIR__ . '/../../../../../config.php');
+
+global $CFG;
+
+require_once($CFG->dirroot . '/group/lib.php');
 /**
  * Class Groups
  *
@@ -77,7 +82,7 @@ class Groups extends Migrator
         }
 
         if (!isset($data['uuid'])) {
-            $this->add_error('Section uuid is not set');
+            $this->add_error('Proccess uuid is not set');
         } else {
             $this->uuid = $data['uuid'];
         }
@@ -100,11 +105,11 @@ class Groups extends Migrator
     {
 
         if (empty($this->groups)) {
-            $this->add_error('No sections to process');
+            $this->add_error('No groups to process');
         }
 
         foreach ($this->groups as $index => $group) {
-            if (!isset($section['name'])) {
+            if (!isset($group['name'])) {
                 $this->add_error("Group name is not set in iteration {$index}");
             }
         }
@@ -113,21 +118,40 @@ class Groups extends Migrator
         return empty($this->errors);
     }
 
-    public function create_groups() {
+    /**
+     * Implement the method to create groups
+     * 
+     * @return void
+     */
+    public function create_groups()
+    {
         if (!$this->is_valid_data()) {
+            $this->fail_creation("Failed section groups", $this->errors, ['recordid' => $this->recordid]);
             return;
         }
 
         foreach ($this->groups as $group) {
             $group = (object) $group;
             $group->courseid = $this->courseid;
-            $group->recordid = $this->recordid;
-            $group->uuid = $this->uuid;
-            $group->errors = [];
-            $group->members = [];
-
-            $group = new Group($group);
-            $group->create_group();
+            groups_create_group($group);
         }
+
+        $this->success();
+    }
+
+    /**
+     * Mark course creation as successful
+     * 
+     * @return void
+     */
+    public function success(): void
+    {
+        global $DB;
+        $DB->delete_records('transfer_pending_commands', ['id' => $this->recordid]);
+
+
+        parent::success_creation("Groups created successfully", ['courseid' => $this->courseid]);
+
+        echo "[+] Groups created in course id: {$this->courseid} \n";
     }
 }
