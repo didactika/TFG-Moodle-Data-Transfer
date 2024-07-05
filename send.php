@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-$connection = new AMQPStreamConnection('172.22.20.197', 5672, 'root', 'U3Enm77b6fCiRFUwxDa3');
+
 $channel = $connection->channel();
 
 $testCourse = [
