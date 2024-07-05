@@ -2,19 +2,13 @@
 
 namespace PhpAmqpLib\Wire\IO;
 
-use PhpAmqpLib\Connection\AMQPConnectionConfig;
-use PhpAmqpLib\Exception\AMQPConnectionClosedException;
 use PhpAmqpLib\Exception\AMQPHeartbeatMissedException;
 use PhpAmqpLib\Exception\AMQPIOWaitException;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Wire\AMQPWriter;
 
 abstract class AbstractIO
 {
     const BUFFER_SIZE = 8192;
-
-    /** @var null|AMQPConnectionConfig */
-    protected $config;
 
     /** @var string */
     protected $host;
@@ -25,10 +19,10 @@ abstract class AbstractIO
     /** @var int|float */
     protected $connection_timeout;
 
-    /** @var float */
+    /** @var int|float */
     protected $read_timeout;
 
-    /** @var float */
+    /** @var int|float */
     protected $write_timeout;
 
     /** @var int */
@@ -46,7 +40,7 @@ abstract class AbstractIO
     /** @var int|float */
     protected $last_write;
 
-    /** @var array<string, mixed>|null */
+    /** @var array|null */
     protected $last_error;
 
     /** @var bool */
@@ -56,7 +50,7 @@ abstract class AbstractIO
      * @param int $len
      * @return string
      * @throws \PhpAmqpLib\Exception\AMQPIOException
-     * @throws AMQPRuntimeException
+     * @throws \PhpAmqpLib\Exception\AMQPRuntimeException
      * @throws \PhpAmqpLib\Exception\AMQPSocketException
      * @throws \PhpAmqpLib\Exception\AMQPTimeoutException
      * @throws \PhpAmqpLib\Exception\AMQPConnectionClosedException
@@ -79,23 +73,20 @@ abstract class AbstractIO
 
     /**
      * @param int|null $sec
-     * @param int $usec
+     * @param int|null $usec
      * @return int
-     * @throws AMQPIOWaitException
-     * @throws AMQPRuntimeException
-     * @throws AMQPConnectionClosedException
+     * @throws \PhpAmqpLib\Exception\AMQPIOException
+     * @throws \PhpAmqpLib\Exception\AMQPRuntimeException
      */
-    public function select(?int $sec, int $usec = 0)
+    public function select($sec, $usec)
     {
         $this->check_heartbeat();
-        $this->setErrorHandler();
+        $this->set_error_handler();
         try {
             $result = $this->do_select($sec, $usec);
-            $this->throwOnError();
+            $this->cleanup_error_handler();
         } catch (\ErrorException $e) {
             throw new AMQPIOWaitException($e->getMessage(), $e->getCode(), $e);
-        } finally {
-            $this->restoreErrorHandler();
         }
 
         if ($this->canDispatchPcntlSignal) {
@@ -112,34 +103,28 @@ abstract class AbstractIO
 
     /**
      * @param int|null $sec
-     * @param int $usec
+     * @param int|null $usec
      * @return int|bool
-     * @throws AMQPConnectionClosedException
      */
-    abstract protected function do_select(?int $sec, int $usec);
+    abstract protected function do_select($sec, $usec);
 
     /**
      * Set ups the connection.
      * @return void
      * @throws \PhpAmqpLib\Exception\AMQPIOException
-     * @throws AMQPRuntimeException
+     * @throws \PhpAmqpLib\Exception\AMQPRuntimeException
      */
     abstract public function connect();
 
     /**
-     * Set connection params connection tune(negotiation).
-     * @param int $heartbeat
+     * @return resource
      */
-    public function afterTune(int $heartbeat): void
-    {
-        $this->heartbeat = $heartbeat;
-        $this->initial_heartbeat = $heartbeat;
-    }
+    abstract public function getSocket();
 
     /**
      * Heartbeat logic: check connection health here
      * @return void
-     * @throws AMQPRuntimeException
+     * @throws \PhpAmqpLib\Exception\AMQPRuntimeException
      */
     public function check_heartbeat()
     {
@@ -159,7 +144,7 @@ abstract class AbstractIO
     /**
      * @throws \PhpAmqpLib\Exception\AMQPHeartbeatMissedException
      */
-    protected function checkBrokerHeartbeat(): void
+    protected function checkBrokerHeartbeat()
     {
         if ($this->heartbeat > 0 && ($this->last_read > 0 || $this->last_write > 0)) {
             $lastActivity = $this->getLastActivity();
@@ -179,17 +164,11 @@ abstract class AbstractIO
         return max($this->last_read, $this->last_write);
     }
 
-    public function getReadTimeout(): float
-    {
-        return $this->read_timeout;
-    }
-
     /**
      * @return $this
      */
     public function disableHeartbeat()
     {
-        $this->initial_heartbeat = $this->heartbeat;
         $this->heartbeat = 0;
 
         return $this;
@@ -221,14 +200,20 @@ abstract class AbstractIO
     /**
      * Begin tracking errors and set the error handler
      */
-    protected function setErrorHandler(): void
+    protected function set_error_handler()
     {
         $this->last_error = null;
         set_error_handler(array($this, 'error_handler'));
     }
 
-    protected function throwOnError(): void
+    /**
+     * throws an ErrorException if an error was handled
+     * @throws \ErrorException
+     */
+    protected function cleanup_error_handler()
     {
+        restore_error_handler();
+
         if ($this->last_error !== null) {
             throw new \ErrorException(
                 $this->last_error['errstr'],
@@ -240,11 +225,6 @@ abstract class AbstractIO
         }
     }
 
-    protected function restoreErrorHandler(): void
-    {
-        restore_error_handler();
-    }
-
     /**
      * Internal error handler to deal with stream and socket errors.
      *
@@ -252,16 +232,20 @@ abstract class AbstractIO
      * @param  string $errstr
      * @param  string $errfile
      * @param  int $errline
+     * @param  array $errcontext
      * @return void
      */
-    public function error_handler($errno, $errstr, $errfile, $errline): void
+    public function error_handler($errno, $errstr, $errfile, $errline, $errcontext = null)
     {
         // throwing an exception in an error handler will halt execution
         //   set the last error and continue
-        $this->last_error = compact('errno', 'errstr', 'errfile', 'errline');
+        $this->last_error = compact('errno', 'errstr', 'errfile', 'errline', 'errcontext');
     }
 
-    protected function isPcntlSignalEnabled(): bool
+    /**
+     * @return bool
+     */
+    protected function isPcntlSignalEnabled()
     {
         return extension_loaded('pcntl')
             && function_exists('pcntl_signal_dispatch')

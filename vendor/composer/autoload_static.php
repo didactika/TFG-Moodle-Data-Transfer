@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4c2cc6830d4533a854817b3d17536533
+class ComposerStaticInit72eebdd8170d4d34ddd0c30f9fd530f0
 {
     public static $files = array (
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
@@ -15,7 +15,7 @@ class ComposerStaticInit4c2cc6830d4533a854817b3d17536533
     public static $prefixLengthsPsr4 = array (
         'p' => 
         array (
-            'phpseclib3\\' => 11,
+            'phpseclib\\' => 10,
         ),
         'l' => 
         array (
@@ -25,7 +25,6 @@ class ComposerStaticInit4c2cc6830d4533a854817b3d17536533
         array (
             'PhpParser\\' => 10,
             'PhpAmqpLib\\' => 11,
-            'ParagonIE\\ConstantTime\\' => 23,
         ),
         'D' => 
         array (
@@ -35,7 +34,7 @@ class ComposerStaticInit4c2cc6830d4533a854817b3d17536533
     );
 
     public static $prefixDirsPsr4 = array (
-        'phpseclib3\\' => 
+        'phpseclib\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
         ),
@@ -50,10 +49,6 @@ class ComposerStaticInit4c2cc6830d4533a854817b3d17536533
         'PhpAmqpLib\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-amqplib/php-amqplib/PhpAmqpLib',
-        ),
-        'ParagonIE\\ConstantTime\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
         'Doctrine\\Instantiator\\' => 
         array (
@@ -701,9 +696,9 @@ class ComposerStaticInit4c2cc6830d4533a854817b3d17536533
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit4c2cc6830d4533a854817b3d17536533::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit4c2cc6830d4533a854817b3d17536533::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit4c2cc6830d4533a854817b3d17536533::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit72eebdd8170d4d34ddd0c30f9fd530f0::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit72eebdd8170d4d34ddd0c30f9fd530f0::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit72eebdd8170d4d34ddd0c30f9fd530f0::$classMap;
 
         }, null, ClassLoader::class);
     }

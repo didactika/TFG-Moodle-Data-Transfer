@@ -1,8 +1,10 @@
 <?php
-
 namespace PhpAmqpLib\Exception;
 
-class AMQPProtocolException extends \Exception implements AMQPExceptionInterface
+/**
+ * @deprecated use AMQPProtocolException instead
+ */
+class AMQPException extends \Exception
 {
     /** @var string */
     public $amqp_reply_code;
@@ -29,6 +31,6 @@ class AMQPProtocolException extends \Exception implements AMQPExceptionInterface
         $this->amqp_reply_text = $reply_text; // redundant, but kept for BC
         $this->amqp_method_sig = $method_sig;
 
-        $this->args = array($reply_code, $reply_text, $method_sig);
+        $this->args = array($reply_code, $reply_text, $method_sig, '');
     }
 }
