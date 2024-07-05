@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_data_transfer';
 $plugin->release = '0.1.0';
-$plugin->version = 2024042412;
+$plugin->version = 2024042413;
 $plugin->requires = 2016052318;
 $plugin->maturity = MATURITY_ALPHA;
