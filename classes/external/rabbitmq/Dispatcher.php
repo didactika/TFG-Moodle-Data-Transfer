@@ -91,7 +91,7 @@ class Dispatcher
                 EventController::save_to_pending_commands(GlobalConstants::EVENT_TYPES["COURSE_SECTION_CREATED"], $body);
                 break;
             case $appid . ".course-groups-created":
-                echo " [+] EVENT: COURSE_SECTION_CREATED PROCESSING\n";
+                echo " [+] EVENT: COURSE_GROUPS_CREATED PROCESSING\n";
                 EventController::save_to_pending_commands(GlobalConstants::EVENT_TYPES["COURSE_GROUPS_CREATED"], $body);
                 break;
             case $appid . ".course-groupings-created":
