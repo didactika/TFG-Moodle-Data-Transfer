@@ -31,6 +31,7 @@ class PendingCommands
     public $sections;
     public $groups;
     public $groupings;
+    public $mods;
 
 
     public function __construct()
@@ -39,6 +40,7 @@ class PendingCommands
         $this->sections = [];
         $this->groups = [];
         $this->groupings = [];
+        $this->mods = [];
     }
 
 
@@ -60,6 +62,9 @@ class PendingCommands
             }
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_GROUPINGS_CREATED']) {
                 $this->groupings[] = new Groupings($pending_command->id, $pending_command->jsondata);
+            }
+            if ($pending_command->type == Constants::EVENT_TYPES['COURSE_MOD_CREATED']) {
+                $this->groupings[] = new Mods($pending_command->id, $pending_command->jsondata);
             }
         }
     }
