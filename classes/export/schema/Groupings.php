@@ -48,6 +48,7 @@ class Groupings
                 'id' => $grouping->id,
                 'name' => $grouping->name,
                 'description' => $grouping->description,
+                'idnumber' => $grouping->idnumber,
                 'groups' => $groups,
             ];
         }
