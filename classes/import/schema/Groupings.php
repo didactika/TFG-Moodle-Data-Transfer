@@ -73,7 +73,7 @@ class Groupings extends Migrator
      */
     public function set_from_json(string $json): void
     {
-        $data = json_decode($json, true);
+        $data = json_decode($json, true)['data'];
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->add_error('Invalid JSON');

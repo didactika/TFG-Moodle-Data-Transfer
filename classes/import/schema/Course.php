@@ -62,7 +62,7 @@ class Course extends Migrator
      */
     public function set_from_json(string $json): void
     {
-        $data = json_decode($json, true);
+        $data = json_decode($json, true)['data'];
 
         if (!isset($data['uuid'])) {
             $this->add_error('Course uuid is not set');
