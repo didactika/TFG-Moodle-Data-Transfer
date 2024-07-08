@@ -20,6 +20,7 @@ use local_data_transfer\import\schema\Course;
 use local_data_transfer\import\schema\Sections;
 use local_data_transfer\import\schema\Groups;
 use local_data_transfer\import\schema\Groupings;
+use local_data_transfer\import\schema\mods\Mod;
 
 use core_course_external;
 use Exception;
@@ -31,6 +32,7 @@ class PendingCommands
     public $sections;
     public $groups;
     public $groupings;
+    public $mods;
 
 
     public function __construct()
@@ -39,6 +41,7 @@ class PendingCommands
         $this->sections = [];
         $this->groups = [];
         $this->groupings = [];
+        $this->mods = [];
     }
 
 
@@ -61,6 +64,9 @@ class PendingCommands
             if ($pending_command->type == Constants::EVENT_TYPES['COURSE_GROUPINGS_CREATED']) {
                 $this->groupings[] = new Groupings($pending_command->id, $pending_command->jsondata);
             }
+            if ($pending_command->type == Constants::EVENT_TYPES['COURSE_MOD_CREATED']) {
+                $this->mods[] = new Mod($pending_command->id, $pending_command->jsondata);
+            }
         }
     }
 
@@ -72,6 +78,7 @@ class PendingCommands
         $this->executer_sections();
         $this->executer_groups();
         $this->executer_groupings();
+        $this->executer_mods();
     }
 
     /**
@@ -168,6 +175,25 @@ class PendingCommands
             }
         } catch (Exception $e) {
             error_log("Error creating groupings: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Create mods in Moodle
+     * 
+     */
+    private function executer_mods(): void
+    {
+        if (empty($this->mods)) {
+            echo "[/] No mods to process.\n";
+            return;
+        }
+        try {
+            foreach ($this->mods as $mod) {
+                $mod->create_mod();
+            }
+        } catch (Exception $e) {
+            error_log("Error creating mods: {$e->getMessage()}");
         }
     }
 }

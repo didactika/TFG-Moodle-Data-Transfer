@@ -89,4 +89,16 @@ class Migrator
         $publisher = new PublisherController();
         $publisher->success_message($data, $message);
     }
+
+
+    /**
+     * Get course object
+     * 
+     * @param int $courseid courseud
+     * @return object
+     */
+    protected function get_course_object($courseid){
+        global $DB;
+        return $DB->get_record('course', array('id' => $courseid));
+    }
 }
