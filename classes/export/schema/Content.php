@@ -64,16 +64,12 @@ class Content
             'course_sections',
             ['course' => $this->courseid],
             'section',
-            'id, section, name, visible, availability'
+            'id'
         );
 
         return array_map(function ($section) {
             return new Section(
-                $section->id,
-                $section->section,
-                $section->name,
-                $section->visible,
-                $section->availability
+                $section->id
             );
         }, $sections);
     }

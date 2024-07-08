@@ -58,10 +58,9 @@ class external_course extends external_api
             'include_mods' => false
         ];
         
-        $exp = new Exporter($courseid, $params['includes']['header'], $params['includes']['content'], $params['includes']['groups'], $params['includes']['groupings']);
+        $exp = new Exporter();
+        return $exp->get_course_schema($courseid, $params['includes']['header'], $params['includes']['content'], $params['includes']['groups'], $params['includes']['groupings'], $opt);
 
-
-        return $exp->get_course_schema($opt);
     }
 
     /**
@@ -122,7 +121,7 @@ class external_course extends external_api
                     new external_single_structure(
                         [
                             'id' => new external_value(PARAM_INT, 'grouping ID'),
-                            'idnumber' => new external_value(PARAM_TEXT, 'grouping idnumber'),
+                            'idnumber' => new external_value(PARAM_TEXT, 'group idnumber'),
                             'name' => new external_value(PARAM_TEXT, 'grouping name'),
                             'description' => new external_value(PARAM_RAW, 'grouping description'),
                             'groups' => new external_multiple_structure(

@@ -20,4 +20,11 @@ $functions = [
         'type'        => 'read',
         'ajax'        => true,
     ],
+    'local_data_transfer_get_mods' => [
+        'classname'   => 'local_data_transfer\services\external_mods',
+        'methodname'  => 'get_mods_schema',
+        'description' => 'Get mods schema',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
 ];
