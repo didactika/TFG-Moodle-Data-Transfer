@@ -3,7 +3,7 @@
         'name' => 'franklin.lopez/data_transfer',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'a7a93fcd072917b4b3768b1a7e4d4bad8e4d4c9d',
+        'reference' => '1489ff07a8b24d4dfa6ab01b1e819079f5460d26',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'franklin.lopez/data_transfer' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'a7a93fcd072917b4b3768b1a7e4d4bad8e4d4c9d',
+            'reference' => '1489ff07a8b24d4dfa6ab01b1e819079f5460d26',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
