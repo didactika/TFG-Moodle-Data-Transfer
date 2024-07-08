@@ -122,6 +122,7 @@ class external_course extends external_api
                     new external_single_structure(
                         [
                             'id' => new external_value(PARAM_INT, 'grouping ID'),
+                            'idnumber' => new external_value(PARAM_TEXT, 'grouping idnumber'),
                             'name' => new external_value(PARAM_TEXT, 'grouping name'),
                             'description' => new external_value(PARAM_RAW, 'grouping description'),
                             'groups' => new external_multiple_structure(
