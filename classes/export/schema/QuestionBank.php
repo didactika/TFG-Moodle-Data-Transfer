@@ -48,7 +48,7 @@ class QuestionBank
      * @return array The hierarchical data structure of categories, subcategories, and questions.
      * @throws \moodle_exception if the course or context is invalid.
      */
-    public function export_course_questions($depth = 3)
+    public function export_course_questions($depth = 3, $includeCourseInfo = true)
     {
         global $PAGE;
 
@@ -60,14 +60,15 @@ class QuestionBank
         }
 
         $course = $this->DB->get_record('course', ['id' => $this->courseid], 'id, fullname, shortname', MUST_EXIST);
-
-        $result = [
+        $result = $includeCourseInfo ? [
             'course' => [
                 'id' => $course->id,
                 'fullname' => $course->fullname,
                 'shortname' => $course->shortname,
                 'categories' => []
             ]
+        ] : [
+            'categories' => []
         ];
 
         // Fetch top-level categories in the course context
@@ -90,7 +91,11 @@ class QuestionBank
 
             // Pass the depth to the export_category function
             $exported_category = self::export_category($top_category, $depth);
-            $result['course']['categories'][] = $exported_category;
+            if($includeCourseInfo) {
+                $result['course']['categories'][] = $exported_category;
+            } else {
+                $result['categories'][] = $exported_category;
+            }
         }
 
         return $result;

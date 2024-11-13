@@ -1,21 +1,30 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_data_transfer\export\schema;
 
 /**
  * Core course class
  *
  * @package     local_data_transfer
  * @category    services
- * @copyright   Franklin López
+ * @copyright 2024 ADSDR-FUNIBER Scepter Team <accion.docente@ct.uneatlantico.es>
+ * @author Eduardo Estrada (e2rd0) <eduardo.estrada@ct.uneatlantico.es>
+ * @author Franklin López
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
- namespace local_data_transfer\export\schema;
-
-/**
- * Course class
- * 
- * This class represents a course in Moodle
- * Handles the course data to be exported/imported
  */
 class Course
 {
@@ -25,10 +34,15 @@ class Course
     public ?Content $course_content = null;
     public ?Groups $course_groups = null;
     public ?Groupings $course_groupings = null;
+
+    public ?QuestionBank $questionBank = null;
+
+    public $include_questionBank = null;
     public bool $include_header;
     public bool $include_content;
     public bool $include_groups;
     public bool $include_groupings;
+    public bool $include_question_bank;
 
     /**
      * Constructor
@@ -38,13 +52,15 @@ class Course
      * @param bool $include_content if true, include the course content 
      * @param bool $include_groups if true, include the course groups
      * @param bool $include_groupings if true, include the course groupings
+     * @param bool $include_question_bank if true, include the course question bank
      */
     public function __construct(
         int $courseid,
         bool $include_header = true,
         bool $include_content = true,
         bool $include_groups = true,
-        bool $include_groupings = true
+        bool $include_groupings = true,
+        bool $include_question_bank = true
     ) {
         global $DB;
         $this->DB = $DB;
@@ -53,6 +69,7 @@ class Course
         $this->include_content = $include_content;
         $this->include_groups = $include_groups;
         $this->include_groupings = $include_groupings;
+        $this->include_question_bank = $include_question_bank;
         $this->set_course_data();
     }
 
@@ -82,6 +99,9 @@ class Course
         }
         if ($this->include_groupings) {
             $this->set_course_groupings();
+        }
+        if ($this->include_question_bank) {
+            $this->set_question_bank();
         }
     }
 
@@ -126,6 +146,17 @@ class Course
     }
 
     /**
+     * This function sets the course question bank
+     * 
+     * @return void
+     */
+
+    public function set_question_bank(): void
+    {
+        $this->questionBank = new QuestionBank($this->courseid);
+    }
+
+    /**
      * Get the course data schema
      * 
      * @param array $opt Options to include in the schema
@@ -150,6 +181,10 @@ class Course
         }
         if ($this->include_groupings && $this->course_groupings !== null) {
             $course['groupings'] = $this->course_groupings->get_groupings();
+        }
+
+        if ($this->include_question_bank && $this->questionBank !== null) {
+            $course['questionbank'] = $this->questionBank->export_course_questions(5, false);
         }
 
         return $course;

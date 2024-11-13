@@ -5,7 +5,9 @@
  *
  * @package     local_data_transfer
  * @category    services
- * @copyright   Franklin López
+ * @copyright  2024 ADSDR-FUNIBER Scepter Team <accion.docente@ct.uneatlantico.es>
+ * @author     Eduardo Estrada (e2rd0) <eduardo.estrada@ct.uneatlantico.es>
+ * @author     Franklin López
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -17,7 +19,6 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
-use external_multiple_structure;
 use local_data_transfer\export\Exporter;
 
 class external_mods extends external_api
@@ -58,29 +59,7 @@ class external_mods extends external_api
  */
 public static function get_mods_schema_returns()
 {
-    return new external_single_structure(
-        [
-            'id' => new external_value(PARAM_INT, 'id'),
-            'section' => new external_value(PARAM_INT, 'section'),
-            'name' => new external_value(PARAM_TEXT, 'name'),
-            'visible' => new external_value(PARAM_INT, 'visible'),
-            'availability' => new external_value(PARAM_RAW, 'availability', VALUE_OPTIONAL),
-            'modules' => new external_multiple_structure(
-                new external_single_structure(
-                    [
-                        'modtype' => new external_value(PARAM_TEXT, 'Module type'),
-                        'instanceid' => new external_value(PARAM_INT, 'Instance ID'),
-                        'name' => new external_value(PARAM_TEXT, 'Module name'),
-                        'intro' => new external_value(PARAM_RAW, 'Module introduction', VALUE_OPTIONAL),
-                        'externalurl' => new external_value(PARAM_URL, 'External URL', VALUE_OPTIONAL),
-                        'display' => new external_value(PARAM_INT, 'Display type', VALUE_OPTIONAL),
-                    ]
-                ),
-                'List of modules',
-                VALUE_OPTIONAL
-            ),
-        ]
-    );
+    return SchemaUtils::get_section_structure(true);
 }
 
 }

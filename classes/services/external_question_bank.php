@@ -18,8 +18,8 @@
  * Class implementing WS local_data_transfer_question_bank
  *
  * @package    local_data_transfer
- * @copyright 2024 ADSDR-FUNIBER Scepter Team <accion.docente@ct.uneatlantico.es>
- * @author Eduardo Estrada (e2rd0) <eduardo.estrada@ct.uneatlantico.es>
+ * @copyright  2024 ADSDR-FUNIBER Scepter Team <accion.docente@ct.uneatlantico.es>
+ * @author     Eduardo Estrada (e2rd0) <eduardo.estrada@ct.uneatlantico.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,11 +27,10 @@ namespace local_data_transfer\services;
 
 use external_function_parameters;
 use external_single_structure;
-use external_multiple_structure;
 use external_api;
 use external_value;
-use local_data_transfer\export\schema\Question;
 use local_data_transfer\export\schema\QuestionBank;
+use local_data_transfer\services\SchemaUtils;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -54,7 +53,7 @@ class external_question_bank extends external_api
     {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
-            'depth' => new external_value(PARAM_INT, 'Depth of subcategory recursion', VALUE_DEFAULT, 3)
+            'depth' => new external_value(PARAM_INT, 'Depth of subcategory recursion', VALUE_DEFAULT, 1)
         ]);
     }
 
@@ -64,7 +63,7 @@ class external_question_bank extends external_api
      * @param int $courseid
      * @param int $depth
      */
-    public static function execute($courseid, $depth = 3)
+    public static function execute($courseid, $depth = 1)
     {
         // Parameter validation.
         $params = self::validate_parameters(
@@ -87,73 +86,9 @@ class external_question_bank extends external_api
      */
     public static function execute_returns(): external_single_structure
     {
-        // Define question structure.
-        $question_structure = new external_single_structure([
-            'id' => new external_value(PARAM_INT, 'Question ID'),
-            'name' => new external_value(PARAM_TEXT, 'Question name'),
-            'questiontext' => new external_value(PARAM_RAW, 'Question text with format'),
-            'qtype' => new external_value(PARAM_TEXT, 'Type of question'),
-            'defaultmark' => new external_value(PARAM_FLOAT, 'Default mark for the question'),
-            'answers' => new external_multiple_structure(
-                new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Answer ID'),
-                    'text' => new external_value(PARAM_RAW, 'Answer text'),
-                    'fraction' => new external_value(PARAM_FLOAT, 'Fraction for this answer'),
-                    'feedback' => new external_value(PARAM_RAW, 'Feedback for this answer')
-                ])
-            ),
-            'hints' => new external_multiple_structure(
-                new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Hint ID'),
-                    'text' => new external_value(PARAM_RAW, 'Hint text')
-                ])
-            )
-        ]);
-
-        // Recursively define the category structure up to the specified depth.
-        $depth = self::get_depth_parameter(); // Assuming this function retrieves the requested depth
-        $category_structure = self::build_category_structure($depth, $question_structure);
-
-        return new external_single_structure([
-            'course' => new external_single_structure([
-                'id' => new external_value(PARAM_INT, 'Course ID'),
-                'fullname' => new external_value(PARAM_TEXT, 'Full name of the course'),
-                'shortname' => new external_value(PARAM_TEXT, 'Short name of the course'),
-                'categories' => new external_multiple_structure($category_structure, 'Top-level categories in the course')
-            ])
-        ]);
+        return SchemaUtils::get_basic_course_structure(self::get_depth_parameter());
     }
 
-    /**
-     * Recursively builds the category structure to the specified depth.
-     *
-     * @param int $depth
-     * @param external_single_structure $question_structure
-     * @return external_single_structure
-     */
-    private static function build_category_structure($depth, $question_structure)
-    {
-        // Base case: if depth is zero, return a category structure without subcategories.
-        if ($depth === 0) {
-            return new external_single_structure([
-                'id' => new external_value(PARAM_INT, 'Category ID'),
-                'name' => new external_value(PARAM_TEXT, 'Category name'),
-                'info' => new external_value(PARAM_RAW, 'Category description/info'),
-                'questions' => new external_multiple_structure($question_structure, 'Questions in this category')
-            ]);
-        }
-
-        // Recursive case: define subcategories and reduce depth.
-        $subcategory_structure = self::build_category_structure($depth - 1, $question_structure);
-
-        return new external_single_structure([
-            'id' => new external_value(PARAM_INT, 'Category ID'),
-            'name' => new external_value(PARAM_TEXT, 'Category name'),
-            'info' => new external_value(PARAM_RAW, 'Category description/info'),
-            'questions' => new external_multiple_structure($question_structure, 'Questions in this category'),
-            'subcategories' => new external_multiple_structure($subcategory_structure, 'List of subcategories within this category')
-        ]);
-    }
 
     /**
      * Retrieves the depth parameter, defaulting to a safe level if not provided.
@@ -162,9 +97,7 @@ class external_question_bank extends external_api
      */
     private static function get_depth_parameter(): int
     {
-        global $PAGE;
-
-        $depth = optional_param('depth', 3, PARAM_INT);
+        $depth = optional_param('depth', 1, PARAM_INT);
         return max(0, min($depth, 5));
     }
 }
