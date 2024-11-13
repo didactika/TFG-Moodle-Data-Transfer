@@ -17,8 +17,9 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     local_data_transfer
- * @copyright   Franklin López
+ * @copyright 2024 ADSDR-FUNIBER Scepter Team <accion.docente@ct.uneatlantico.es>
+ * @author Eduardo Estrada (e2rd0) <eduardo.estrada@ct.uneatlantico.es>
+ * @author Franklin López
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_data_transfer';
 $plugin->release = '0.1.0';
-$plugin->version = 2024042416;
+$plugin->version = 2024111300;
 $plugin->requires = 2016052318;
 $plugin->maturity = MATURITY_ALPHA;
